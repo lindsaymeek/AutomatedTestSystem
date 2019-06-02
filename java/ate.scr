@@ -1,0 +1,19 @@
+;
+;Example automated test script
+;
+;Tests a 50% resistive divider with IN and OUT
+;
+$VAR IN=P01 OUT=P00
+$RATE 100
+$TIMEOUT 1000
+$MSG Applying Forward Voltage Test
+$ORDER IN OUT
+1 0.1-0.3
+
+
+
+
+
+
+
+

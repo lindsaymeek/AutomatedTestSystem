@@ -1,0 +1,46 @@
+XH
+H 1 areas 8 global symbols
+M INVERT.ASM
+A text size 20 flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\INVERT.ASM
+dbfunc 0 ? 0 I
+dbline 49 0
+dbline 4A 2
+dbline 4B 3
+dbline 4C 4
+dbline 4D 6
+dbline 4E 8
+dbline 4F A
+dbline 50 C
+dbline 51 D
+dbline 67 E
+dbline 68 10
+dbline 69 11
+dbline 6A 12
+dbline 6B 14
+dbline 6C 16
+dbline 6D 18
+dbline 6E 1A
+dbline 6F 1B
+dbline 7A 1C
+dbline 7B 1F
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\LIB\INVERT.ASM
+dbfunc 0 ? 0 I
+dbfile Invert.inc
+dbfunc 0 ? 0 I
+S Invert_SetPower Def0000
+S _Invert_Start Def0000
+S _Invert_SetPower Def0000
+S Invert_Stop Def001C
+S Invert_SetGain Def000E
+S _Invert_Stop Def001C
+S _Invert_SetGain Def000E
+S Invert_Start Def0000
+T 00 00 21 03 4F 08 5D 7F 21 FC 2B 00 60 7F 18 7F
+R 00 00 00 00
+T 00 0E 21 F0 4F 08 5D 7D 21 0F 2B 00 60 7D 18 7F
+R 00 00 00 00
+T 00 1C 41 7F FC 7F
+R 00 00 00 00

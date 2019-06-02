@@ -1,0 +1,14 @@
+XH
+H 1 areas 2 global symbols
+M UARTOU~1.ASM
+A text size 2 flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\UARTOU~1.ASM
+dbfunc 0 ? 0 I
+dbline 33 0
+dbline 50 1
+dbfile UARTOUT.inc
+dbfunc 0 ? 0 I
+S UARTOUTRX_INT Def0001
+S UARTOUTTX_INT Def0000
+T 00 00 7E 7E
+R 00 00 00 00

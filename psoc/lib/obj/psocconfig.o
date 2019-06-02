@@ -1,0 +1,68 @@
+XH
+H 1 areas 8 global symbols
+M PSOCCO~1.ASM
+S LoadConfigTBL_entry201_Bank0 Ref0000
+S LoadConfigTBL_entry201_Bank1 Ref0000
+A text size 40 flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\PSOCCO~1.ASM
+dbfunc 0 ? 0 I
+dbline 20 0
+dbline 22 3
+dbline 29 4
+dbline 2A 5
+dbline 2B 6
+dbline 2C 8
+dbline 2D A
+dbline 2E C
+dbline 2F E
+dbline 30 10
+dbline 31 12
+dbline 32 14
+dbline 33 16
+dbline 34 17
+dbline 35 18
+dbline 41 19
+dbline 43 1B
+dbline 44 1C
+dbline 45 1D
+dbline 46 1E
+dbline 47 20
+dbline 48 22
+dbline 49 23
+dbline 4A 25
+dbline 4B 26
+dbline 4C 27
+dbline 4D 28
+dbline 4E 2A
+dbline 50 2B
+dbline 51 2C
+dbline 52 2D
+dbline 53 2E
+dbline 54 2F
+dbline 55 31
+dbline 56 33
+dbline 57 34
+dbline 58 35
+dbline 59 36
+dbline 5A 38
+dbline 5C 39
+dbline 5E 3B
+dbline 5F 3C
+dbline 60 3D
+dbline 61 3F
+S _NO_SHADOW Def0040
+S _LoadConfig_entry201 Def0004
+S LoadConfigInit Def0000
+S NO_SHADOW Def0040
+S _LoadConfigInit Def0000
+S LoadConfig_entry201 Def0004
+T 00 00 7C 00 04 7F 08 10 71 10 50 00 00 57 00 00
+R 00 00 00 00 00 03 00 00 4B 0B 00 01 0B 0E 00 01
+T 00 0C 90 0B 70 EF 50 00 00 57 00 00 90 03 20 18
+R 00 00 00 00 4B 07 00 00 0B 0A 00 00
+T 00 18 7F 38 01 10 08 28 39 FF A0 1A 4F 54 FD 18
+R 00 00 00 00
+T 00 26 20 75 D0 02 74 10 08 28 4F 59 FD 61 00 18
+R 00 00 00 00
+T 00 34 20 75 D0 02 74 8F E1 18 18 38 FF 7F
+R 00 00 00 00

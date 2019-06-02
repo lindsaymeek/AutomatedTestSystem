@@ -1,0 +1,67 @@
+ 0000           ;------------------------------------------------------------------------------
+ 0000           ;  FILENAME:   SampleCLKint.asm
+ 0000           ;   VERSION:   REV B, 2002 Mar 30
+ 0000           ;------------------------------------------------------------------------------
+ 0000           ;  DESCRIPTION:
+ 0000           ;     Interrupt handler routine for Counter8 user module instance:
+ 0000           ;        SampleCLK.
+ 0000           ;------------------------------------------------------------------------------
+ 0000           ;       Copyright (c) Cypress MicroSystems 2000-2002.  All Rights Reserved.
+ 0000           ;------------------------------------------------------------------------------
+ 0000           
+ 0008           bSampleCLK_INT_MASK:         equ 08h  
+ 0000           ;counter8 interrupt address
+ 00E1           SampleCLK_INT_REG:           equ 0e1h  
+ 0000           
+ 0000           
+ 0000           ;---------------------------------
+ 0000           ;  Registers used by counter8
+ 0000           ;---------------------------------
+ 002F           SampleCLK_CONTROL_REG:  equ 2fh                  ;Control register
+ 002C           SampleCLK_COUNTER_REG:  equ 2ch                  ;Counter register
+ 002D           SampleCLK_PERIOD_REG:   equ 2dh                  ;Period value register
+ 002E           SampleCLK_COMPARE_REG:  equ 2eh                  ;CompareValue register
+ 002C           SampleCLK_FUNC_REG: equ 2ch                      ;Function register
+ 002D           SampleCLK_INPUT_REG:    equ 2dh                  ;Input register
+ 002E           SampleCLK_OUTPUT_REG:   equ 2eh                  ;Output register
+ 0000           
+ 0000           ; end of file
+ 0000           
+ 0000           ;-----------------------------------------------------
+ 0000           ;  Export interrupt handler
+ 0000           ;     NOTE that interrupt handler is NOT exported
+ 0000           ;     for access by C function.  Interrupt handlers
+ 0000           ;     are not callable by C functions.
+ 0000           ;-----------------------------------------------------
+                export   SampleCLKINT
+                
+                ;-----------------------------------------------------------------------------
+                ;  FUNCTION NAME: SampleCLKInt
+                ;
+                ;  DESCRIPTION:
+                ;     Counter8 interrupt handler for instance SampleCLK.  
+                ;
+                ;     This is a place holder function.  If the user requires use of an interrupt
+                ;     handler for this function, then place code where specified.
+                ;
+                ;  ARGUMENTS:
+                ;     none.
+                ;
+                ;  RETURNS:
+                ;     none.
+                ;
+                ;  SIDE EFFECTS:
+                ;     none.
+                ;
+                ;  THEORY of OPERATION:  
+                ;     none.
+                ;
+                ;-----------------------------------------------------------------------------
+ 0000           SampleCLKINT:
+ 0000              ;--------------------------
+ 0000              ; Place user code here!!!
+ 0000              ;--------------------------
+ 0000 7E           reti
+ 0001                   
+ 0001           
+ 0001           ; end of file

@@ -1,0 +1,93 @@
+XH
+H 1 areas 15 global symbols
+M ADC.ASM
+S ADC_fIncr Ref0000
+S ADC_iIncr Ref0000
+S ADC_bIncrC Ref0000
+S ADC_cCounterU Ref0000
+S ADC_cTimerU Ref0000
+A text size 5A flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\ADC.ASM
+dbfunc 0 ? 0 I
+dbline 31 0
+dbline 32 1
+dbline 33 2
+dbline 34 4
+dbline 35 5
+dbline 36 7
+dbline 37 9
+dbline 38 B
+dbline 39 D
+dbline 3A E
+dbline 3B F
+dbline 46 10
+dbline 47 13
+dbline 53 14
+dbline 54 16
+dbline 56 19
+dbline 58 1C
+dbline 5A 1F
+dbline 5B 22
+dbline 5C 25
+dbline 5D 28
+dbline 5E 2B
+dbline 5F 2E
+dbline 60 31
+dbline 6B 32
+dbline 6C 35
+dbline 6D 38
+dbline 6E 39
+dbline 2 3A
+dbline 1 3C
+dbline 5 3E
+dbline 7 41
+dbline 8 43
+dbline 1 45
+dbline 72 47
+dbline 74 4A
+dbline 75 4D
+dbline 80 4E
+dbline 81 50
+dbline 8D 51
+dbline 8E 53
+dbline 8F 55
+dbline 99 56
+dbline 9A 59
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\LIB\ADC.ASM
+dbfunc 0 ? 0 I
+dbfile ADC.inc
+dbfunc 0 ? 0 I
+S ADC_GetSamples Def0014
+S _ADC_fIsData Def004E
+S ADC_iGetData Def0051
+S _ADC_Stop Def0010
+S ADC_Start Def0000
+S ADC_StopAD Def0032
+S ADC_SetPower Def0000
+S _ADC_GetSamples Def0014
+S ADC_ClearFlag Def0056
+S _ADC_iGetData Def0051
+S _ADC_Start Def0000
+S _ADC_StopAD Def0032
+S _ADC_SetPower Def0000
+S ADC_fIsData Def004E
+S ADC_Stop Def0010
+S _ADC_ClearFlag Def0056
+T 00 00 10 4F 21 03 08 5D 8B 21 FC 2B 00 60 8B 18
+R 00 00 00 00
+T 00 0E 20 7F 41 8B FC 7F 53 00 00 43 E1 03 55
+R 00 00 00 00 0B 09 00 02
+T 00 1A 00 00 01 43 8A 20 43 8B 10 55 00 00 E0 62
+R 00 00 00 00 0B 02 00 04 0B 0C 00 03
+T 00 26 21 FF 62 25 FF 62 23 01 55 00 00 00 7F 62
+R 00 00 00 00 0B 0B 00 00
+T 00 33 23 00 62 27 00 40 40 5D FF 70 FE 41 E1 FC
+R 00 00 00 00
+T 00 41 21 80 A0 03 71 01 43 8A 20 43 8B 10 7F 51
+R 00 00 00 00
+T 00 4F 00 00 7F 58 00 00 51 00 01 7F 55
+R 00 00 00 00 0B 02 00 00 0B 06 00 01 0B 09 00 01
+T 00 57 00 00 00 7F
+R 00 00 00 00 0B 02 00 00

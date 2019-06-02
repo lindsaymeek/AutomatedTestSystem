@@ -1,0 +1,136 @@
+ 0000           ;------------------------------------------------------------------------------
+ 0000           ;  FILENAME:   UARTOUTint.asm
+ 0000           ;   VERSION:    Rev B, 2002 Mar 30
+ 0000           ;------------------------------------------------------------------------------
+ 0000           ;  DESCRIPTION:
+ 0000           ;     Interrupt handler routine for UART user module instance:
+ 0000           ;        UARTOUT.
+ 0000           ;------------------------------------------------------------------------------
+ 0000           ;       Copyright (c) Cypress MicroSystems 2000-2002.  All Rights Reserved.
+ 0000           ;------------------------------------------------------------------------------
+ 0000           
+ 0010           bUARTOUT_TX_INT_MASK:        equ 10h  
+ 0000           ;TX interrupt address
+ 00E1           UARTOUT_TX_INT_REG:          equ 0e1h  
+ 0000           ;mask value for global int reg bit for RX instance
+ 0020           bUARTOUT_RX_INT_MASK:        equ 20h  
+ 0000           ;RX interrupt address
+ 00E1           UARTOUT_RX_INT_REG:          equ 0e1h  
+ 0000                
+ 0000           ;------------------------------------
+ 0000           ;  Parity masks
+ 0000           ;------------------------------------
+ 0000           UART_PARITY_NONE:       equ   00h
+ 0002           UART_PARITY_EVEN:       equ   02h
+ 0006           UART_PARITY_ODD:        equ   06h
+ 0000                                         
+ 0000           ;------------------------------------
+ 0000           ;  TX Status Register masks
+ 0000           ;------------------------------------
+ 0020           UART_TX_COMPLETE:       equ   20h
+ 0010           UART_TX_BUFFER_EMPTY:   equ   10h
+ 0000           
+ 0000           ;------------------------------------
+ 0000           ;  RX Status Register masks
+ 0000           ;------------------------------------
+ 0010           UART_RX_ACTIVE:         equ   10h
+ 0008           UART_RX_COMPLETE:       equ   08h
+ 0080           UART_RX_PARITY_ERROR:   equ   80h
+ 0040           UART_RX_OVERRUN_ERROR:  equ   40h
+ 0020           UART_RX_FRAMING_ERROR:  equ   20h
+ 00E0           UART_RX_NO_ERROR:       equ   E0h
+ 0000           
+ 0000           
+ 0000           ;---------------------------------
+ 0000           ;  Registers used by TX
+ 0000           ;---------------------------------
+ 0033           UARTOUT_TX_CONTROL_REG: equ 33h                  ;Control register
+ 0030           UARTOUT_TX_SHIFT_REG:   equ 30h                  ;TX Shift Register register
+ 0031           UARTOUT_TX_BUFFER_REG:  equ 31h                  ;TX Buffer Register
+ 0030           UARTOUT_TX_FUNC_REG:    equ 30h                  ;Function register
+ 0031           UARTOUT_TX_INPUT_REG:   equ 31h                  ;Input register
+ 0032           UARTOUT_TX_OUTPUT_REG:  equ 32h                  ;Output register
+ 0000           
+ 0000           ;---------------------------------
+ 0000           ;  Registers used by RX
+ 0000           ;---------------------------------
+ 0037           UARTOUT_RX_CONTROL_REG: equ 37h                  ;Control register
+ 0034           UARTOUT_RX_SHIFT_REG:   equ 34h                  ;RX Shift Register register
+ 0036           UARTOUT_RX_BUFFER_REG:  equ 36h                  ;RX Buffer Register
+ 0034           UARTOUT_RX_FUNC_REG:    equ 34h                  ;Function register
+ 0035           UARTOUT_RX_INPUT_REG:   equ 35h                  ;Input register
+ 0036           UARTOUT_RX_OUTPUT_REG:  equ 36h                  ;Output register
+ 0000           
+ 0000           ; end of file
+ 0000           
+                area text (ROM, REL)
+                
+                ;-----------------------------------------------------
+                ;  Export interrupt handler
+                ;     NOTE that interrupt handler is NOT exported
+                ;     for access by C function.  Interrupt handlers
+                ;     are not callable by C functions.
+                ;-----------------------------------------------------
+                export   UARTOUTTX_INT
+                export   UARTOUTRX_INT
+                
+                ;-----------------------------------------------------------------------------
+                ;  FUNCTION NAME: UARTOUTTX_INT
+                ;
+                ;  DESCRIPTION:
+                ;     UART TX interrupt handler for instance UARTOUT.  
+                ;
+                ;     This is a place holder function.  If the user requires use of an interrupt
+                ;     handler for this function, then place code where specified.
+                ;
+                ;  ARGUMENTS:
+                ;     none.
+                ;
+                ;  RETURNS:
+                ;     none.
+                ;
+                ;  SIDE EFFECTS:
+                ;     none.
+                ;
+                ;  THEORY of OPERATION:  
+                ;     none.
+                ;
+                ;-----------------------------------------------------------------------------
+ 0000           UARTOUTTX_INT:
+ 0000              ;--------------------------
+ 0000              ; Place user code here!!!
+ 0000              ;--------------------------
+ 0000 7E           reti
+ 0001                   
+ 0001           
+ 0001           ;-----------------------------------------------------------------------------
+ 0001           ;  FUNCTION NAME: UARTOUTRX_INT
+ 0001           ;
+ 0001           ;  DESCRIPTION:
+ 0001           ;     UART RX interrupt handler for instance UARTOUT.  
+ 0001           ;
+ 0001           ;     This is a place holder function.  If the user requires use of an interrupt
+ 0001           ;     handler for this function, then place code where specified.
+ 0001           ;
+ 0001           ;  ARGUMENTS:
+ 0001           ;     none.
+ 0001           ;
+ 0001           ;  RETURNS:
+ 0001           ;     none.
+ 0001           ;
+ 0001           ;  SIDE EFFECTS:
+ 0001           ;     none.
+ 0001           ;
+ 0001           ;  THEORY of OPERATION:  
+ 0001           ;     none.
+ 0001           ;
+ 0001           ;-----------------------------------------------------------------------------
+ 0001           UARTOUTRX_INT:
+ 0001              ;--------------------------
+ 0001              ; Place user code here!!!
+ 0001              ;--------------------------
+ 0001 7E           reti
+ 0002                   
+ 0002           
+ 0002           ; end of file
+ 0002                   

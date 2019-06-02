@@ -1,0 +1,1 @@
+-F0x30  -blit:0x101.0x1fff -bdata:0.0xff -g  -o"entry201" -LE:\CONTES~1\PSOC\TOOLS  "E:\contest2002\Entry201\obj\main.o" cms.a  E:\CONTES~1\ENTRY201\LIB\LIBPSOC.A

@@ -1,0 +1,46 @@
+XH
+H 1 areas 8 global symbols
+M SINGLE~1.ASM
+A text size 20 flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\SINGLE~1.ASM
+dbfunc 0 ? 0 I
+dbline 49 0
+dbline 4A 2
+dbline 4C 3
+dbline 4D 4
+dbline 4E 6
+dbline 4F 8
+dbline 50 A
+dbline 51 C
+dbline 52 D
+dbline 68 E
+dbline 69 10
+dbline 6B 11
+dbline 6C 12
+dbline 6D 14
+dbline 6E 16
+dbline 6F 18
+dbline 70 1A
+dbline 71 1B
+dbline 7C 1C
+dbline 7D 1F
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\LIB\SINGLE~1.ASM
+dbfunc 0 ? 0 I
+dbfile SingleEnded.inc
+dbfunc 0 ? 0 I
+S _SingleEnded_Start Def0000
+S _SingleEnded_SetPower Def0000
+S SingleEnded_Stop Def001C
+S SingleEnded_SetGain Def000E
+S _SingleEnded_Stop Def001C
+S _SingleEnded_SetGain Def000E
+S SingleEnded_Start Def0000
+S SingleEnded_SetPower Def0000
+T 00 00 21 03 4F 08 5D 7B 21 FC 2B 00 60 7B 18 7F
+R 00 00 00 00
+T 00 0E 21 F8 4F 08 5D 79 21 07 2B 00 60 79 18 7F
+R 00 00 00 00
+T 00 1C 41 7B FC 7F
+R 00 00 00 00

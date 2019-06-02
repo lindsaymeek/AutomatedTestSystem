@@ -1,0 +1,196 @@
+ 0000           ;  Personalization tables 
+                export LoadConfigTBL_entry201_Bank1
+                export LoadConfigTBL_entry201_Bank0
+ 0000           LoadConfigTBL_entry201_Bank1:
+ 0000           ;  Global Register values
+ 0000 6113              db              61h, 13h                ; AnalogClockSelect register
+ 0002 60EF              db              60h, efh                ; AnalogColumnClockSelect register
+ 0004 6200              db              62h, 00h                ; AnalogIOControl register
+ 0006 6300              db              63h, 00h                ; AnalogModulatorControl register
+ 0008 E100              db              e1h, 00h                ; OscillatorControl_1 register
+ 000A 0000              db              00h, 00h                ; Port_0_DriveMode_0 register
+ 000C 01FF              db              01h, ffh                ; Port_0_DriveMode_1 register
+ 000E 0200              db              02h, 00h                ; Port_0_IntCtrl_0 register
+ 0010 0300              db              03h, 00h                ; Port_0_IntCtrl_1 register
+ 0012 04A0              db              04h, a0h                ; Port_1_DriveMode_0 register
+ 0014 055F              db              05h, 5fh                ; Port_1_DriveMode_1 register
+ 0016 0600              db              06h, 00h                ; Port_1_IntCtrl_0 register
+ 0018 0700              db              07h, 00h                ; Port_1_IntCtrl_1 register
+ 001A 0800              db              08h, 00h                ; Port_2_DriveMode_0 register
+ 001C 0900              db              09h, 00h                ; Port_2_DriveMode_1 register
+ 001E 0A00              db              0ah, 00h                ; Port_2_IntCtrl_0 register
+ 0020 0B00              db              0bh, 00h                ; Port_2_IntCtrl_1 register
+ 0022 0C00              db              0ch, 00h                ; Port_3_DriveMode_0 register
+ 0024 0D00              db              0dh, 00h                ; Port_3_DriveMode_1 register
+ 0026 0E00              db              0eh, 00h                ; Port_3_IntCtrl_0 register
+ 0028 0F00              db              0fh, 00h                ; Port_3_IntCtrl_1 register
+ 002A 1000              db              10h, 00h                ; Port_4_DriveMode_0 register
+ 002C 1100              db              11h, 00h                ; Port_4_DriveMode_1 register
+ 002E 1200              db              12h, 00h                ; Port_4_IntCtrl_0 register
+ 0030 1300              db              13h, 00h                ; Port_4_IntCtrl_1 register
+ 0032 1400              db              14h, 00h                ; Port_5_DriveMode_0 register
+ 0034 1500              db              15h, 00h                ; Port_5_DriveMode_1 register
+ 0036 1600              db              16h, 00h                ; Port_5_IntCtrl_0 register
+ 0038 1700              db              17h, 00h                ; Port_5_IntCtrl_1 register
+ 003A E384              db              e3h, 84h                ; VoltageMonitorControl register
+ 003C           ;  Instance name ADC, User Module ADCINC12
+ 003C           ;       Instance name ADC, Block Name ADC(ASA12)
+ 003C           ;       Instance name ADC, Block Name CNT(DBA01)
+ 003C 2421              db              24h, 21h                ;ADC_CounterFN
+ 003E 2562              db              25h, 62h                ;ADC_CounterSL
+ 0040 2600              db              26h, 00h                ;ADC_CounterOS
+ 0042           ;       Instance name ADC, Block Name TMR(DBA00)
+ 0042 2020              db              20h, 20h                ;ADC_TimerFN
+ 0044 2112              db              21h, 12h                ;ADC_TimerSL
+ 0046 2200              db              22h, 00h                ;ADC_TimerOS
+ 0048           ;  Instance name BAUDCLK, User Module Counter8
+ 0048           ;       Instance name BAUDCLK, Block Name CNTR8(DBA02)
+ 0048 2831              db              28h, 31h                ;BAUDCLK_FUNC_REG   
+ 004A 2915              db              29h, 15h                ;BAUDCLK_INPUT_REG  
+ 004C 2A04              db              2ah, 04h                ;BAUDCLK_OUTPUT_REG 
+ 004E           ;  Instance name DAC_P02, User Module DAC6
+ 004E           ;       Instance name DAC_P02, Block Name DAC(ASA23)
+ 004E           ;  Instance name DAC_P03, User Module DAC6
+ 004E           ;       Instance name DAC_P03, Block Name DAC(ASB20)
+ 004E           ;  Instance name DAC_P04, User Module DAC6
+ 004E           ;       Instance name DAC_P04, Block Name DAC(ASB22)
+ 004E           ;  Instance name DAC_P05, User Module DAC6
+ 004E           ;       Instance name DAC_P05, Block Name DAC(ASA21)
+ 004E           ;  Instance name DoubleEnded, User Module INSAMP
+ 004E           ;       Instance name DoubleEnded, Block Name INV(ACA00)
+ 004E           ;       Instance name DoubleEnded, Block Name NON_INV(ACA01)
+ 004E           ;  Instance name Invert, User Module AMPINV_A
+ 004E           ;       Instance name Invert, Block Name INVAMP(ACA03)
+ 004E           ;  Instance name SampleCLK, User Module Counter8
+ 004E           ;       Instance name SampleCLK, Block Name CNTR8(DBA03)
+ 004E 2C31              db              2ch, 31h                ;SampleCLK_FUNC_REG   
+ 0050 2D15              db              2dh, 15h                ;SampleCLK_INPUT_REG  
+ 0052 2E00              db              2eh, 00h                ;SampleCLK_OUTPUT_REG 
+ 0054           ;  Instance name SingleEnded, User Module PGA_A
+ 0054           ;       Instance name SingleEnded, Block Name GAIN(ACA02)
+ 0054           ;  Instance name UARTIN, User Module UART
+ 0054           ;       Instance name UARTIN, Block Name RX(DCA06)
+ 0054 3805              db              38h, 05h                ;UARTIN_RX_FUNC_REG   
+ 0056 39C1              db              39h, c1h                ;UARTIN_RX_INPUT_REG  
+ 0058 3A00              db              3ah, 00h                ;UARTIN_RX_OUTPUT_REG 
+ 005A           ;       Instance name UARTIN, Block Name TX(DCA07)
+ 005A 3C0D              db              3ch, 0dh                ;UARTIN_TX_FUNC_REG   
+ 005C 3D01              db              3dh, 01h                ;UARTIN_TX_INPUT_REG  
+ 005E 3E05              db              3eh, 05h                ;UARTIN_TX_OUTPUT_REG 
+ 0060           ;  Instance name UARTOUT, User Module UART
+ 0060           ;       Instance name UARTOUT, Block Name RX(DCA05)
+ 0060 3405              db              34h, 05h                ;UARTOUT_RX_FUNC_REG   
+ 0062 35E1              db              35h, e1h                ;UARTOUT_RX_INPUT_REG  
+ 0064 3600              db              36h, 00h                ;UARTOUT_RX_OUTPUT_REG 
+ 0066           ;       Instance name UARTOUT, Block Name TX(DCA04)
+ 0066 300D              db              30h, 0dh                ;UARTOUT_TX_FUNC_REG   
+ 0068 3101              db              31h, 01h                ;UARTOUT_TX_INPUT_REG  
+ 006A 3207              db              32h, 07h                ;UARTOUT_TX_OUTPUT_REG 
+ 006C FF                db              ffh
+ 006D           LoadConfigTBL_entry201_Bank0:
+ 006D           ;  Global Register values
+ 006D 6028              db              60h, 28h                ; AnalogColumnInputSelect register
+ 006F 6305              db              63h, 05h                ; AnalogReferenceControl register
+ 0071 6500              db              65h, 00h                ; AnalogSyncControl register
+ 0073 E600              db              e6h, 00h                ; DecimatorControl register
+ 0075 0200              db              02h, 00h                ; Port_0_Bypass register
+ 0077 0100              db              01h, 00h                ; Port_0_IntEn register
+ 0079 06F0              db              06h, f0h                ; Port_1_Bypass register
+ 007B 0500              db              05h, 00h                ; Port_1_IntEn register
+ 007D 0A00              db              0ah, 00h                ; Port_2_Bypass register
+ 007F 0900              db              09h, 00h                ; Port_2_IntEn register
+ 0081 0E00              db              0eh, 00h                ; Port_3_Bypass register
+ 0083 0D00              db              0dh, 00h                ; Port_3_IntEn register
+ 0085 1200              db              12h, 00h                ; Port_4_Bypass register
+ 0087 1100              db              11h, 00h                ; Port_4_IntEn register
+ 0089 1600              db              16h, 00h                ; Port_5_Bypass register
+ 008B 1500              db              15h, 00h                ; Port_5_IntEn register
+ 008D           ;  Instance name ADC, User Module ADCINC12
+ 008D           ;       Instance name ADC, Block Name ADC(ASA12)
+ 008D 8890              db              88h, 90h                ;ADC_AtoDcr0
+ 008F 8900              db              89h, 00h                ;ADC_AtoDcr1
+ 0091 8A60              db              8ah, 60h                ;ADC_AtoDcr2
+ 0093 8BF0              db              8bh, f0h                ;ADC_AtoDcr3
+ 0095           ;       Instance name ADC, Block Name CNT(DBA01)
+ 0095 2700              db              27h, 00h                ;ADC_CounterCR0
+ 0097 2500              db              25h, 00h                ;ADC_CounterDR1
+ 0099 2600              db              26h, 00h                ;ADC_CounterDR2
+ 009B           ;       Instance name ADC, Block Name TMR(DBA00)
+ 009B 2300              db              23h, 00h                ;ADC_TimerCR0
+ 009D 2100              db              21h, 00h                ;ADC_TimerDR1
+ 009F 2200              db              22h, 00h                ;ADC_TimerDR2
+ 00A1           ;  Instance name BAUDCLK, User Module Counter8
+ 00A1           ;       Instance name BAUDCLK, Block Name CNTR8(DBA02)
+ 00A1 2B00              db              2bh, 00h                ;BAUDCLK_CONTROL_REG
+ 00A3 299C              db              29h, 9ch                ;BAUDCLK_PERIOD_REG 
+ 00A5 2A4E              db              2ah, 4eh                ;BAUDCLK_COMPARE_REG
+ 00A7           ;  Instance name DAC_P02, User Module DAC6
+ 00A7           ;       Instance name DAC_P02, Block Name DAC(ASA23)
+ 00A7 9C80              db              9ch, 80h                ;DAC_P02_CR0
+ 00A9 9D40              db              9dh, 40h                ;DAC_P02_CR1
+ 00AB 9EA0              db              9eh, a0h                ;DAC_P02_CR2
+ 00AD 9F30              db              9fh, 30h                ;DAC_P02_CR3
+ 00AF           ;  Instance name DAC_P03, User Module DAC6
+ 00AF           ;       Instance name DAC_P03, Block Name DAC(ASB20)
+ 00AF 9080              db              90h, 80h                ;DAC_P03_CR0
+ 00B1 9180              db              91h, 80h                ;DAC_P03_CR1
+ 00B3 92A0              db              92h, a0h                ;DAC_P03_CR2
+ 00B5 9330              db              93h, 30h                ;DAC_P03_CR3
+ 00B7           ;  Instance name DAC_P04, User Module DAC6
+ 00B7           ;       Instance name DAC_P04, Block Name DAC(ASB22)
+ 00B7 9880              db              98h, 80h                ;DAC_P04_CR0
+ 00B9 9980              db              99h, 80h                ;DAC_P04_CR1
+ 00BB 9AA0              db              9ah, a0h                ;DAC_P04_CR2
+ 00BD 9B30              db              9bh, 30h                ;DAC_P04_CR3
+ 00BF           ;  Instance name DAC_P05, User Module DAC6
+ 00BF           ;       Instance name DAC_P05, Block Name DAC(ASA21)
+ 00BF 9480              db              94h, 80h                ;DAC_P05_CR0
+ 00C1 9540              db              95h, 40h                ;DAC_P05_CR1
+ 00C3 96A0              db              96h, a0h                ;DAC_P05_CR2
+ 00C5 9730              db              97h, 30h                ;DAC_P05_CR3
+ 00C7           ;  Instance name DoubleEnded, User Module INSAMP
+ 00C7           ;       Instance name DoubleEnded, Block Name INV(ACA00)
+ 00C7 717D              db              71h, 7dh                ;DoubleEnded_INV_CR0
+ 00C9 7221              db              72h, 21h                ;DoubleEnded_INV_CR1
+ 00CB 7320              db              73h, 20h                ;DoubleEnded_INV_CR2
+ 00CD           ;       Instance name DoubleEnded, Block Name NON_INV(ACA01)
+ 00CD 757C              db              75h, 7ch                ;DoubleEnded_NON_INV_CR0
+ 00CF 7621              db              76h, 21h                ;DoubleEnded_NON_INV_CR1
+ 00D1 7720              db              77h, 20h                ;DoubleEnded_NON_INV_CR2
+ 00D3           ;  Instance name Invert, User Module AMPINV_A
+ 00D3           ;       Instance name Invert, Block Name INVAMP(ACA03)
+ 00D3 7D7C              db              7dh, 7ch                ;Invert_INVAMP_CR0
+ 00D5 7E23              db              7eh, 23h                ;Invert_INVAMP_CR1
+ 00D7 7F20              db              7fh, 20h                ;Invert_INVAMP_CR2
+ 00D9           ;  Instance name SampleCLK, User Module Counter8
+ 00D9           ;       Instance name SampleCLK, Block Name CNTR8(DBA03)
+ 00D9 2F00              db              2fh, 00h                ;SampleCLK_CONTROL_REG
+ 00DB 2D9C              db              2dh, 9ch                ;SampleCLK_PERIOD_REG 
+ 00DD 2E4E              db              2eh, 4eh                ;SampleCLK_COMPARE_REG
+ 00DF           ;  Instance name SingleEnded, User Module PGA_A
+ 00DF           ;       Instance name SingleEnded, Block Name GAIN(ACA02)
+ 00DF 79FD              db              79h, fdh                ;SingleEnded_GAIN_CR0
+ 00E1 7A21              db              7ah, 21h                ;SingleEnded_GAIN_CR1
+ 00E3 7B20              db              7bh, 20h                ;SingleEnded_GAIN_CR2
+ 00E5           ;  Instance name UARTIN, User Module UART
+ 00E5           ;       Instance name UARTIN, Block Name RX(DCA06)
+ 00E5 3B00              db              3bh, 00h                ;UARTIN_RX_CONTROL_REG
+ 00E7 3900              db              39h, 00h                ;UARTIN_
+ 00E9 3A00              db              3ah, 00h                ;UARTIN_RX_BUFFER_REG 
+ 00EB           ;       Instance name UARTIN, Block Name TX(DCA07)
+ 00EB 3F00              db              3fh, 00h                ;UARTIN_TX_CONTROL_REG
+ 00ED 3D00              db              3dh, 00h                ;UARTIN_TX_BUFFER_REG 
+ 00EF 3E00              db              3eh, 00h                ;UARTIN_
+ 00F1           ;  Instance name UARTOUT, User Module UART
+ 00F1           ;       Instance name UARTOUT, Block Name RX(DCA05)
+ 00F1 3700              db              37h, 00h                ;UARTOUT_RX_CONTROL_REG
+ 00F3 3500              db              35h, 00h                ;UARTOUT_
+ 00F5 3600              db              36h, 00h                ;UARTOUT_RX_BUFFER_REG 
+ 00F7           ;       Instance name UARTOUT, Block Name TX(DCA04)
+ 00F7 3300              db              33h, 00h                ;UARTOUT_TX_CONTROL_REG
+ 00F9 3100              db              31h, 00h                ;UARTOUT_TX_BUFFER_REG 
+ 00FB 3200              db              32h, 00h                ;UARTOUT_
+ 00FD FF                db              ffh
+ 00FE           
+ 00FE           
+ 00FE           ; PSoC Configuration file trailer PsocConfig.asm

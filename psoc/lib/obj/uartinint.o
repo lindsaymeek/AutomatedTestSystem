@@ -1,0 +1,14 @@
+XH
+H 1 areas 2 global symbols
+M UARTIN~1.ASM
+A text size 2 flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\UARTIN~1.ASM
+dbfunc 0 ? 0 I
+dbline 33 0
+dbline 50 1
+dbfile UARTIN.inc
+dbfunc 0 ? 0 I
+S UARTINRX_INT Def0001
+S UARTINTX_INT Def0000
+T 00 00 7E 7E
+R 00 00 00 00

@@ -1,0 +1,90 @@
+XH
+H 2 areas 9 global symbols
+M ADCINT.ASM
+A text size 68 flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\ADCINT.ASM
+dbfunc 0 ? 0 I
+dbline 31 0
+dbline 32 2
+dbline 3D 3
+dbline 3F 5
+dbline 40 7
+dbline 42 8
+dbline 43 B
+dbline 45 D
+dbline 46 10
+dbline 48 13
+dbline 4A 16
+dbline 4C 19
+dbline 4E 1A
+dbline 4F 1D
+dbline 54 1F
+dbline 56 22
+dbline 57 25
+dbline 58 26
+dbline 59 28
+dbline 5A 2A
+dbline 5B 2B
+dbline 5C 2E
+dbline 5E 30
+dbline 5F 32
+dbline 61 34
+dbline 62 36
+dbline 63 37
+dbline 64 39
+dbline 66 3A
+dbline 67 3D
+dbline 68 3F
+dbline 69 42
+dbline 6D 43
+dbline 6E 46
+dbline 70 48
+dbline 71 4A
+dbline 73 4C
+dbline 74 4F
+dbline 75 52
+dbline 76 53
+dbline 77 54
+dbline 7A 57
+dbline 7C 5A
+dbline 7D 5D
+dbline 81 5E
+dbline 82 61
+dbline 83 64
+dbline 84 67
+S ADC_CNT_INT Def0000
+S ADC_TMR_INT Def0003
+A bss size 6 flags 20
+dbfile E:\CONTES~1\ENTRY201\LIB\ADCINT.ASM
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\LIB\ADCINT.ASM
+dbfunc 0 ? 0 I
+dbfile ADC.inc
+dbfunc 0 ? 0 I
+S ADC_fIncr Def0004
+S ADC_iIncr Def0002
+S ADC_bIncrC Def0005
+S _ADC_fIncr Def0004
+S _ADC_iIncr Def0002
+S ADC_cCounterU Def0001
+S ADC_cTimerU Def0000
+T 00 00 76 00 01 7E 7A 00 00 A0 02 7E 49 8B 10 A0
+R 00 00 00 00 09 03 00 01 09 07 00 01
+T 00 0C 0E 62 27 01 41 8B EF 41 8A DF 55 00 00 40
+R 00 00 00 00 09 0D 00 01
+T 00 19 7E 62 27 00 71 01 43 8A 20 43 8B 10 08 5D
+R 00 00 00 00
+T 00 27 24 5D 26 73 3C 00 01 20 B0 05 7A 00 01 50
+R 00 00 00 00 09 07 00 01 09 0D 00 01
+T 00 33 FF 68 00 01 6D 68 00 01 6D 5F 00 02
+R 00 00 00 00 09 04 00 01 09 08 00 01 09 0C 00 01
+T 00 3C 00 01 53 00 03 55 00 04 01 18 3C
+R 00 00 00 00 09 02 00 01 09 05 00 01 09 08 00 01
+T 00 44 00 05 00 A0 17 7A 00 05 B0 13 62 23 00 62
+R 00 00 00 00 09 02 00 01 09 08 00 01
+T 00 50 27 00 40 40 41 E1 FC 43 8A 20 43 8B 10 7E
+R 00 00 00 00
+T 00 5E 55 00 00 01 55 00 01 E0 62 25 FF 7E
+R 00 00 00 00 09 03 00 01 09 07 00 01

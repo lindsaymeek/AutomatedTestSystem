@@ -1,0 +1,96 @@
+XH
+H 1 areas 10 global symbols
+M SAMPLE~1.ASM
+A text size 5E flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\SAMPLE~1.ASM
+dbfunc 0 ? 0 I
+dbline 1 0
+dbline 4A 3
+dbline 2 4
+dbline 1 6
+dbline 5 8
+dbline 7 B
+dbline 8 D
+dbline 1 F
+dbline 65 11
+dbline 7F 12
+dbline 80 15
+dbline 9A 16
+dbline 9B 19
+dbline B4 1A
+dbline B5 1D
+dbline BB 1F
+dbline BC 20
+dbline 1 21
+dbline BE 23
+dbline BF 25
+dbline C0 26
+dbline 1 29
+dbline C2 2B
+dbline C3 2C
+dbline C4 2E
+dbline 1 2F
+dbline C6 31
+dbline 1 33
+dbline C8 35
+dbline C9 36
+dbline CE 37
+dbline CF 39
+dbline E7 3A
+dbline E8 3C
+dbline 101 3D
+dbline 102 3F
+dbline 1 40
+dbline 123 42
+dbline 124 44
+dbline 126 45
+dbline 1 48
+dbline 12A 4A
+dbline 12B 4C
+dbline 12E 4D
+dbline 130 4F
+dbline 132 51
+dbline 134 52
+dbline 135 53
+dbline 1 55
+dbline 139 57
+dbline 13A 58
+dbline 1 5A
+dbline 13E 5C
+dbline 140 5D
+dbfile SampleCLK.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\LIB\SAMPLE~1.ASM
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+S _SampleCLK_Start Def0012
+S SampleCLK_WritePeriod Def001A
+S SampleCLK_EnableInt Def0000
+S bSampleCLK_ReadCompareValue Def003D
+S SampleCLK_Stop Def0016
+S bSampleCLK_ReadCounter Def0040
+S _SampleCLK_WritePeriod Def001A
+S SampleCLK_WriteCompareValue Def003A
+S _SampleCLK_EnableInt Def0000
+S SampleCLK_DisableInt Def0004
+S _bSampleCLK_ReadCompareValue Def003D
+S _SampleCLK_Stop Def0016
+S SampleCLK_Start Def0012
+S _bSampleCLK_ReadCounter Def0040
+S _SampleCLK_WriteCompareValue Def003A
+S _SampleCLK_DisableInt Def0004
+T 00 00 43 E1 08 7F 5D FF 70 FE 41 E1 F7 21 80 A0
+R 00 00 00 00
+T 00 0E 03 71 01 7F 43 2F 01 7F 41 2F FE 7F 49 2F
+R 00 00 00 00
+T 00 1C 01 B0 19 10 5C 71 10 5D 2D 08 41 2D F0 70
+R 00 00 00 00
+T 00 2A EF 5B 60 2D 18 71 10 60 2D 70 EF 20 7F 60
+R 00 00 00 00
+T 00 38 2D 7F 60 2E 7F 5D 2E 7F 71 10 5D 2D 08 41
+R 00 00 00 00
+T 00 46 2D F0 70 EF 5D 2E 08 5D 2C 5D 2E 5C 18 60
+R 00 00 00 00
+T 00 54 2E 71 10 18 60 2D 70 EF 5B 7F
+R 00 00 00 00

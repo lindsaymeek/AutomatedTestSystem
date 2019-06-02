@@ -1,0 +1,63 @@
+XH
+H 1 areas 8 global symbols
+M DOUBLE~1.ASM
+A text size 39 flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\DOUBLE~1.ASM
+dbfunc 0 ? 0 I
+dbline 5B 0
+dbline 5C 2
+dbline 5E 3
+dbline 5F 4
+dbline 60 6
+dbline 61 8
+dbline 62 A
+dbline 64 C
+dbline 65 E
+dbline 66 10
+dbline 67 12
+dbline 68 14
+dbline 69 15
+dbline 79 16
+dbline 7A 18
+dbline 7C 19
+dbline 7D 1A
+dbline 7E 1C
+dbline 7F 1E
+dbline 80 20
+dbline 82 22
+dbline 83 24
+dbline 84 26
+dbline 85 27
+dbline 86 29
+dbline 87 2B
+dbline 88 2D
+dbline 89 2F
+dbline 8A 30
+dbline 8B 31
+dbline 9A 32
+dbline 9B 35
+dbline 9C 38
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\LIB\DOUBLE~1.ASM
+dbfunc 0 ? 0 I
+dbfile DoubleEnded.inc
+dbfunc 0 ? 0 I
+S _DoubleEnded_Start Def0000
+S _DoubleEnded_SetPower Def0000
+S DoubleEnded_Stop Def0032
+S DoubleEnded_SetGain Def0016
+S _DoubleEnded_Stop Def0032
+S _DoubleEnded_SetGain Def0016
+S DoubleEnded_Start Def0000
+S DoubleEnded_SetPower Def0000
+T 00 00 21 03 4F 08 5D 73 21 FC 2B 00 60 73 5D 77
+R 00 00 00 00
+T 00 0E 21 FC 2B 00 60 77 18 7F 21 F0 4F 08 5D 75
+R 00 00 00 00
+T 00 1C 21 0F 2B 00 60 75 50 E0 13 00 08 5D 71 21
+R 00 00 00 00
+T 00 2A 0F 2B 01 60 71 18 18 7F 41 77 FC 41 73 FC
+R 00 00 00 00
+T 00 38 7F
+R 00 00 00 00

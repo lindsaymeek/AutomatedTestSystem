@@ -1,0 +1,2432 @@
+ 0000           
+ 0000           ;
+ 0000           ;Circuit Cellar Cypress PSOC Design Contest
+ 0000           ;Contest Entry 201
+ 0000           ;
+ 0000           ;Title:                         Reconfigurable Test System
+ 0000           ;Version:                       21/5/02
+ 0000           ;Description:           This is the main code for reconfiguring and
+ 0000           ;                                       operating the PSOC as a cascadable test POD
+ 0000           ;                                       
+ 0000           
+                export _main
+                
+ 0010           FlagXIOMask:  equ 10h
+ 0008           FlagSuper:    equ 08h
+ 0004           FlagCarry:    equ 04h
+ 0002           FlagZero:     equ 02h
+ 0001           FlagGlobalIE: equ 01h
+ 0000           
+ 0000           
+ 0000           ;;===================================
+ 0000           ;;      Register Space, Bank 0
+ 0000           ;;===================================
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Port Registers
+ 0000           ;  Note: Also see this address range in Bank 1.
+ 0000           ;------------------------------------------------
+ 0000           ; Port 0
+ 0000           PRT0DR:       equ 00h          ; Port 0 Data Register              (RW)
+ 0001           PRT0IE:       equ 01h          ; Port 0 Interrupt Enable Register  (WO)
+ 0002           PRT0GS:       equ 02h          ; Port 0 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 03h
+ 0000           ; Port 1
+ 0004           PRT1DR:       equ 04h          ; Port 1 Data Register              (RW)
+ 0005           PRT1IE:       equ 05h          ; Port 1 Interrupt Enable Register  (WO)
+ 0006           PRT1GS:       equ 06h          ; Port 1 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 07h
+ 0000           ; Port 2
+ 0008           PRT2DR:       equ 08h          ; Port 2 Data Register              (RW)
+ 0009           PRT2IE:       equ 09h          ; Port 2 Interrupt Enable Register  (WO)
+ 000A           PRT2GS:       equ 0Ah          ; Port 2 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 0Bh
+ 0000           ; Port 3
+ 000C           PRT3DR:       equ 0Ch          ; Port 3 Data Register              (RW)
+ 000D           PRT3IE:       equ 0Dh          ; Port 3 Interrupt Enable Register  (WO)
+ 000E           PRT3GS:       equ 0Eh          ; Port 3 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 0Fh
+ 0000           ; Port 4
+ 0010           PRT4DR:       equ 10h          ; Port 4 Data Register              (RW)
+ 0011           PRT4IE:       equ 11h          ; Port 4 Interrupt Enable Register  (WO)
+ 0012           PRT4GS:       equ 12h          ; Port 4 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 13h
+ 0000           ; Port 5
+ 0014           PRT5DR:       equ 14h          ; Port 5 Data Register              (RW)
+ 0015           PRT5IE:       equ 15h          ; Port 5 Interrupt Enable Register  (WO)
+ 0016           PRT5GS:       equ 16h          ; Port 5 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 17h
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Digital PSoC(tm) block Registers
+ 0000           ;  Note: Also see this address range in Bank 1.
+ 0000           ;------------------------------------------------
+ 0000           ; Digital PSoC block 0, Basic Type A
+ 0020           DBA00DR0:     equ 20h          ; data register 0                   (RO)
+ 0021           DBA00DR1:     equ 21h          ; data register 1                   (WO)
+ 0022           DBA00DR2:     equ 22h          ; data register 2                   (RW)
+ 0023           DBA00CR0:     equ 23h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 1, Basic Type A
+ 0024           DBA01DR0:     equ 24h          ; data register 0                   (RO)
+ 0025           DBA01DR1:     equ 25h          ; data register 1                   (WO)
+ 0026           DBA01DR2:     equ 26h          ; data register 2                   (RW)
+ 0027           DBA01CR0:     equ 27h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 2, Basic Type A
+ 0028           DBA02DR0:     equ 28h          ; data register 0                   (RO)
+ 0029           DBA02DR1:     equ 29h          ; data register 1                   (WO)
+ 002A           DBA02DR2:     equ 2Ah          ; data register 2                   (RW)
+ 002B           DBA02CR0:     equ 2Bh          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 3, Basic Type A
+ 002C           DBA03DR0:     equ 2Ch          ; data register 0                   (RO)
+ 002D           DBA03DR1:     equ 2Dh          ; data register 1                   (WO)
+ 002E           DBA03DR2:     equ 2Eh          ; data register 2                   (RW)
+ 002F           DBA03CR0:     equ 2Fh          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 4, Communications Type A
+ 0030           DCA04DR0:     equ 30h          ; data register 0                   (RO)
+ 0031           DCA04DR1:     equ 31h          ; data register 1                   (WO)
+ 0032           DCA04DR2:     equ 32h          ; data register 2                   (RW)
+ 0033           DCA04CR0:     equ 33h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 5, Communications Type A
+ 0034           DCA05DR0:     equ 34h          ; data register 0                   (RO)
+ 0035           DCA05DR1:     equ 35h          ; data register 1                   (WO)
+ 0036           DCA05DR2:     equ 36h          ; data register 2                   (RW)
+ 0037           DCA05CR0:     equ 37h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 6, Communications Type A
+ 0038           DCA06DR0:     equ 38h          ; data register 0                   (RO)
+ 0039           DCA06DR1:     equ 39h          ; data register 1                   (WO)
+ 003A           DCA06DR2:     equ 3Ah          ; data register 2                   (RW)
+ 003B           DCA06CR0:     equ 3Bh          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 7, Communications Type A
+ 003C           DCA07DR0:     equ 3Ch          ; data register 0                   (RO)
+ 003D           DCA07DR1:     equ 3Dh          ; data register 1                   (WO)
+ 003E           DCA07DR2:     equ 3Eh          ; data register 2                   (RW)
+ 003F           DCA07CR0:     equ 3Fh          ; control & status register 0       (RW)
+ 0000           
+ 0000           
+ 0000           ;-------------------------------------
+ 0000           ;  Analog Resource Control Registers
+ 0000           ;-------------------------------------
+ 0060           AMX_IN:       equ 60h          ; analog input multiplexor control  (RW)
+ 0000                                          ; AMX_IN Bit field masks:
+ 00C0           AMX_IN_ACI3:          equ C0h          ; column 3 input mux
+ 0030           AMX_IN_ACI2:          equ 30h          ; column 2 input mux
+ 000C           AMX_IN_ACI1:          equ 0Ch          ; column 1 input mux
+ 0003           AMX_IN_ACI0:          equ 03h          ; column 0 input mux
+ 0000           
+ 0000           ; (Reserved)  equ 61h          ; reserved
+ 0000           ; (Reserved)  equ 62h          ; reserved
+ 0000           
+ 0063           ARF_CR:       equ 63h          ; analog reference control          (RW)
+ 0000                                          ; ARF_CR Bit field masks:
+ 0080           ARF_CR_BGT:           equ 80h          ; Bandgap Test
+ 0040           ARF_CR_HBE:           equ 40h          ; Bias level control
+ 0038           ARF_CR_REF:           equ 38h          ; Analog array ref control
+ 0004           ARF_CR_APWR:          equ 04h          ; Analog Power
+ 0003           ARF_CR_SCPWR:         equ 03h          ; Switched Cap block power
+ 0000           
+ 0064           CMP_CR:       equ 64h          ; comparator control                (*)
+ 0000                                          ; CMP_CR Bit field masks:
+ 0080           CMP_CR_COMP3:         equ 80h          ; Column 3 comparator state     (R)
+ 0040           CMP_CR_COMP2:         equ 40h          ; Column 2 comparator state     (R)
+ 0020           CMP_CR_COMP1:         equ 20h          ; Column 1 comparator state     (R)
+ 0010           CMP_CR_COMP0:         equ 10h          ; Column 0 comparator state     (R)
+ 0008           CMP_CR_AINT3:         equ 08h          ; Column 3 interrupt source     (RW)
+ 0004           CMP_CR_AINT2:         equ 04h          ; Column 2 interrupt source     (RW)
+ 0002           CMP_CR_AINT1:         equ 02h          ; Column 1 interrupt source     (RW)
+ 0001           CMP_CR_AINT0:         equ 01h          ; Column 0 interrupt source     (RW)
+ 0000           
+ 0065           ASY_CR:       equ 65h          ; analog synchronizaton control     (*)
+ 0000                                          ; ASY_CR Bit field masks:
+ 0007           ASY_CR_SARCOUNT:      equ 07h          ; SAR support: resolution count (W0)
+ 0008           ASY_CR_SARSIGN:       equ 08h          ; SAR support: sign             (RW)
+ 0006           ASY_CR_SARCOL:        equ 06h          ; SAR support: column spec	   (RW)
+ 0001           ASY_CR_SYNCEN:        equ 01h          ; Stall bit                     (RW)
+ 0000           
+ 0000           
+ 0000           ;---------------------------------------------------
+ 0000           ;  Analog PSoC block Registers
+ 0000           ;
+ 0000           ;  Note: the following registers are mapped into
+ 0000           ;  both register bank 0 AND register bank 1.
+ 0000           ;---------------------------------------------------
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 0
+ 0000           ; (Reserved)  equ 70h
+ 0071           ACA00CR0:     equ 71h          ; Control register 0                (RW)
+ 0072           ACA00CR1:     equ 72h          ; Control register 1                (RW)
+ 0073           ACA00CR2:     equ 73h          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 1
+ 0000           ; (Reserved)  equ 74h
+ 0075           ACA01CR0:     equ 75h          ; Control register 0                (RW)
+ 0076           ACA01CR1:     equ 76h          ; Control register 1                (RW)
+ 0077           ACA01CR2:     equ 77h          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 2
+ 0000           ; (Reserved)  equ 78h
+ 0079           ACA02CR0:     equ 79h          ; Control register 0                (RW)
+ 007A           ACA02CR1:     equ 7Ah          ; Control register 1                (RW)
+ 007B           ACA02CR2:     equ 7Bh          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 3
+ 0000           ; (Reserved)  equ 7Ch
+ 007D           ACA03CR0:     equ 7Dh          ; Control register 0                (RW)
+ 007E           ACA03CR1:     equ 7Eh          ; Control register 1                (RW)
+ 007F           ACA03CR2:     equ 7Fh          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 1 Col 0
+ 0080           ASA10CR0:     equ 80h          ; Control register 0                (RW)
+ 0081           ASA10CR1:     equ 81h          ; Control register 1                (RW)
+ 0082           ASA10CR2:     equ 82h          ; Control register 2                (RW)
+ 0083           ASA10CR3:     equ 83h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 1 Col 1
+ 0084           ASB11CR0:     equ 84h          ; Control register 0                (RW)
+ 0085           ASB11CR1:     equ 85h          ; Control register 1                (RW)
+ 0086           ASB11CR2:     equ 86h          ; Control register 2                (RW)
+ 0087           ASB11CR3:     equ 87h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 1 Col 2
+ 0088           ASA12CR0:     equ 88h          ; Control register 0                (RW)
+ 0089           ASA12CR1:     equ 89h          ; Control register 1                (RW)
+ 008A           ASA12CR2:     equ 8Ah          ; Control register 2                (RW)
+ 008B           ASA12CR3:     equ 8Bh          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 1 Col 3
+ 008C           ASB13CR0:     equ 8Ch          ; Control register 0                (RW)
+ 008D           ASB13CR1:     equ 8Dh          ; Control register 1                (RW)
+ 008E           ASB13CR2:     equ 8Eh          ; Control register 2                (RW)
+ 008F           ASB13CR3:     equ 8Fh          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 2 Col 0
+ 0090           ASB20CR0:     equ 90h          ; Control register 0                (RW)
+ 0091           ASB20CR1:     equ 91h          ; Control register 1                (RW)
+ 0092           ASB20CR2:     equ 92h          ; Control register 2                (RW)
+ 0093           ASB20CR3:     equ 93h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 2 Col 1
+ 0094           ASA21CR0:     equ 94h          ; Control register 0                (RW)
+ 0095           ASA21CR1:     equ 95h          ; Control register 1                (RW)
+ 0096           ASA21CR2:     equ 96h          ; Control register 2                (RW)
+ 0097           ASA21CR3:     equ 97h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 2 Col 2
+ 0098           ASB22CR0:     equ 98h          ; Control register 0                (RW)
+ 0099           ASB22CR1:     equ 99h          ; Control register 1                (RW)
+ 009A           ASB22CR2:     equ 9Ah          ; Control register 2                (RW)
+ 009B           ASB22CR3:     equ 9Bh          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 2 Col 3
+ 009C           ASA23CR0:     equ 9Ch          ; Control register 0                (RW)
+ 009D           ASA23CR1:     equ 9Dh          ; Control register 1                (RW)
+ 009E           ASA23CR2:     equ 9Eh          ; Control register 2                (RW)
+ 009F           ASA23CR3:     equ 9Fh          ; Control register 3                (RW)
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  System and Global Resource Registers
+ 0000           ;  Note: Also see this address range in Bank 1.
+ 0000           ;------------------------------------------------
+ 00E0           INT_MSK0:                  equ E0h   ; General Interrupt Mask Register   (RW)
+ 0040           INT_MSK0_Sleep:            equ 40h  ; MASK: enable/disable sleep interrupt
+ 0020           INT_MSK0_GPIO:             equ 20h  ; MASK: enable/disable GPIO  interrupt
+ 0010           INT_MSK0_AColumn3:         equ 10h  ; MASK: enable/disable Analog col 3 interrupt
+ 0008           INT_MSK0_AColumn2:         equ 08h  ; MASK: enable/disable Analog col 2 interrupt
+ 0004           INT_MSK0_AColumn1:         equ 04h  ; MASK: enable/disable Analog col 1 interrupt
+ 0002           INT_MSK0_AColumn0:         equ 02h  ; MASK: enable/disable Analog col 0 interrupt
+ 0001           INT_MSK0_VoltageMonitor:   equ 01h  ; MASK: enable/disable Volts interrupt
+ 0000           
+ 00E1           INT_MSK1:     equ E1h          ; Digital PSoC block Mask Register  (RW)
+ 00E2           INT_VC:       equ E2h          ; Interrupt vector register         (RW)
+ 00E3           RES_WDT:      equ E3h          ; Watch Dog Timer                   (RW)
+ 0000           
+ 0000           ; DECIMATOR Registers
+ 00E4           DEC_DH:       equ E4h          ; Data Register (high byte)         (RW)
+ 00E5           DEC_DL:       equ E5h          ; Data Register ( low byte)         (RO)
+ 00E6           DEC_CR:       equ E6h          ; Data Control Register             (RW)
+ 0000           
+ 0000           ; Multiplier and MAC (Multiply/Accumulate) Unit
+ 00E8           MUL_X:        equ E8h          ; Multiplier X Register (write)            (WO)
+ 00E9           MUL_Y:        equ E9h          ; Multiplier Y Register (write)            (WO)
+ 00EA           MUL_DH:       equ EAh          ; Multiplier Result Data (high byte read)  (RO)
+ 00EB           MUL_DL:       equ EBh          ; Multiplier Result Data ( low byte read)  (RO)
+ 00EC           MAC_X:        equ ECh          ; MAC X register (write) [also see ACC_DR1](WO)
+ 00ED           MAC_Y:        equ EDh          ; MAC Y register (write) [also see ACC_DR0](WO)
+ 00EE           MAC_CL0:      equ EEh          ; MAC Clear Accum (write)[also see ACC_DR3](WO)
+ 00EF           MAC_CL1:      equ EFh          ; MAC Clear Accum (write)[also see ACC_DR2](WO)
+ 00EC           ACC_DR1:      equ ECh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 00ED           ACC_DR0:      equ EDh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 00EE           ACC_DR3:      equ EEh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 00EF           ACC_DR2:      equ EFh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 0000           
+ 0000           ; Test Mode mapping of the CPU Flag (F) Register
+ 00F7           CPU_FLAG:     equ F7h          ; NOTE: Only mapped when in Test Mode !!!
+ 0000           
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  System Status and Control Register
+ 0000           ;
+ 0000           ;  Note: the following register is mapped into
+ 0000           ;  both register bank 0 AND register bank 1.
+ 0000           ;------------------------------------------------
+ 00FF           CPU_SCR:                equ FFh   ;                                     (*)
+ 0080           CPUSCR_GIEMask:         equ 80h   ; MASK: flag reg Global Int Enable shadow
+ 0020           CPUSCR_WDRSMask:        equ 20h   ; MASK: Watch Dog Timer Reset
+ 0010           CPUSCR_PORSMask:        equ 10h   ; MASK: power-on reset bit PORS
+ 0008           CPUSCR_SleepMask:       equ 08h   ; MASK: Enable Sleep
+ 0001           CPUSCR_StopMask:        equ 01h   ; MASK: Halt CPU bit
+ 0000           
+ 0000           
+ 0000           ;;===================================
+ 0000           ;;      Register Space, Bank 1
+ 0000           ;;===================================
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Port Registers
+ 0000           ;  Note: Also see this address range in Bank 0.
+ 0000           ;------------------------------------------------
+ 0000           ; Port 0
+ 0000           PRT0DM0:      equ 00h          ; Port 0 Drive Mode 0               (WO)
+ 0001           PRT0DM1:      equ 01h          ; Port 0 Drive Mode 1               (WO)
+ 0002           PRT0IC0:      equ 02h          ; Port 0 Interrupt Control 0        (WO)
+ 0003           PRT0IC1:      equ 03h          ; Port 0 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 1
+ 0004           PRT1DM0:      equ 04h          ; Port 1 Drive Mode 0               (WO)
+ 0005           PRT1DM1:      equ 05h          ; Port 1 Drive Mode 1               (WO)
+ 0006           PRT1IC0:      equ 06h          ; Port 1 Interrupt Control 0        (WO)
+ 0007           PRT1IC1:      equ 07h          ; Port 1 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 2
+ 0008           PRT2DM0:      equ 08h          ; Port 2 Drive Mode 0               (WO)
+ 0009           PRT2DM1:      equ 09h          ; Port 2 Drive Mode 1               (WO)
+ 000A           PRT2IC0:      equ 0Ah          ; Port 2 Interrupt Control 0        (WO)
+ 000B           PRT2IC1:      equ 0Bh          ; Port 2 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 3
+ 000C           PRT3DM0:      equ 0Ch          ; Port 3 Drive Mode 0               (WO)
+ 000D           PRT3DM1:      equ 0Dh          ; Port 3 Drive Mode 1               (WO)
+ 000E           PRT3IC0:      equ 0Eh          ; Port 3 Interrupt Control 0        (WO)
+ 000F           PRT3IC1:      equ 0Fh          ; Port 3 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 4
+ 0010           PRT4DM0:      equ 10h          ; Port 4 Drive Mode 0               (WO)
+ 0011           PRT4DM1:      equ 11h          ; Port 4 Drive Mode 1               (WO)
+ 0012           PRT4IC0:      equ 12h          ; Port 4 Interrupt Control 0        (WO)
+ 0013           PRT4IC1:      equ 13h          ; Port 4 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 5
+ 0014           PRT5DM0:      equ 14h          ; Port 5 Drive Mode 0               (WO)
+ 0015           PRT5DM1:      equ 15h          ; Port 5 Drive Mode 1               (WO)
+ 0016           PRT5IC0:      equ 16h          ; Port 5 Interrupt Control 0        (WO)
+ 0017           PRT5IC1:      equ 17h          ; Port 5 Interrupt Control 1        (WO)
+ 0000           
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Digital PSoC(tm) block Registers
+ 0000           ;  Note: Also see this address range in Bank 0.
+ 0000           ;------------------------------------------------
+ 0000           
+ 0000           ; Digital PSoC block 0, Basic Type A
+ 0020           DBA00FN:      equ 20h          ; Function Register                 (RW)
+ 0021           DBA00IN:      equ 21h          ;    Input Register                 (RW)
+ 0022           DBA00OU:      equ 22h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 23h
+ 0000           
+ 0000           ; Digital PSoC block 1, Basic Type A
+ 0024           DBA01FN:      equ 24h          ; Function Register                 (RW)
+ 0025           DBA01IN:      equ 25h          ;    Input Register                 (RW)
+ 0026           DBA01OU:      equ 26h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 27h
+ 0000           
+ 0000           ; Digital PSoC block 2, Basic Type A
+ 0028           DBA02FN:      equ 28h          ; Function Register                 (RW)
+ 0029           DBA02IN:      equ 29h          ;    Input Register                 (RW)
+ 002A           DBA02OU:      equ 2Ah          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 2Bh
+ 0000           
+ 0000           ; Digital PSoC block 3, Basic Type A
+ 002C           DBA03FN:      equ 2Ch          ; Function Register                 (RW)
+ 002D           DBA03IN:      equ 2Dh          ;    Input Register                 (RW)
+ 002E           DBA03OU:      equ 2Eh          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 2Fh
+ 0000           
+ 0000           ; Digital PSoC block 4, Communications Type A
+ 0030           DCA04FN:      equ 30h          ; Function Register                 (RW)
+ 0031           DCA04IN:      equ 31h          ;    Input Register                 (RW)
+ 0032           DCA04OU:      equ 32h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 33h
+ 0000           
+ 0000           ; Digital PSoC block 5, Communications Type A
+ 0034           DCA05FN:      equ 34h          ; Function Register                 (RW)
+ 0035           DCA05IN:      equ 35h          ;    Input Register                 (RW)
+ 0036           DCA05OU:      equ 36h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 37h
+ 0000           
+ 0000           ; Digital PSoC block 6, Communications Type A
+ 0038           DCA06FN:      equ 38h          ; Function Register                 (RW)
+ 0039           DCA06IN:      equ 39h          ;    Input Register                 (RW)
+ 003A           DCA06OU:      equ 3Ah          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 3Bh
+ 0000           
+ 0000           ; Digital PSoC block 7, Communications Type A
+ 003C           DCA07FN:      equ 3Ch          ; Function Register                 (RW)
+ 003D           DCA07IN:      equ 3Dh          ;    Input Register                 (RW)
+ 003E           DCA07OU:      equ 3Eh          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 3Fh
+ 0000           
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  System and Global Resource Registers
+ 0000           ;  Note: Also see this address range in Bank 0.
+ 0000           ;------------------------------------------------
+ 0000           
+ 0060           CLK_CR0:      equ 60h          ; Analog Column Clock Select Register     (RW)
+ 00C0           CLK_CR0_AColumn3:     equ C0h  ; MASK: Specify clock for analog cloumn
+ 0030           CLK_CR0_AColumn2:     equ 30h  ; MASK: Specify clock for analog cloumn
+ 000C           CLK_CR0_AColumn1:     equ 0Ch  ; MASK: Specify clock for analog cloumn
+ 0003           CLK_CR0_AColumn0:     equ 03h  ; MASK: Specify clock for analog cloumn
+ 0000           
+ 0061           CLK_CR1:      equ 61h          ; Analog Clock Source Select Register     (RW)
+ 0040           CLK_CR1_SHDIS:        equ 40h  ; MASK: Sample and Hold Disable (all Columns)
+ 0031           CLK_CR1_ACLK1:        equ 31h  ; MASK: Digital PSoC block for analog source
+ 0007           CLK_CR1_ACLK2:        equ 07h  ; MASK: Digital PSoC block for analog source
+ 0000           
+ 0062           ABF_CR:       equ 62h          ; Analog Output Buffer Control Register   (RW)
+ 00C0           ABF_CR_ACI3:          equ C0h  ; MASK: Level 1 input mux for analog column 3
+ 0030           ABF_CR_ACI2:          equ 30h  ; MASK: Level 1 input mux for analog column 2
+ 000C           ABF_CR_ACI1:          equ 0Ch  ; MASK: Level 1 input mux for analog column 1
+ 0003           ABF_CR_ACI0:          equ 03h  ; MASK: Level 1 input mux for analog column 0
+ 0000           
+ 0063           AMD_CR:       equ 63h          ; Analog Modulator Control Register       (RW)
+ 000C           AMD_CR_AMOD2:         equ 0Ch  ; MASK: Modulation source for analog column 2
+ 0003           AMD_CR_AMOD0:         equ 03h  ; MASK: Modulation source for analog column 1
+ 0000           
+ 0000           
+ 00E0           OSC_CR0:      equ E0h          ; System Oscillator Control Register      (RW)
+ 0080           OSC_CR0_32K_Select:   equ 80h  ; MASK: Enable/Disable External XTAL Oscillator
+ 0040           OSC_CR0_PLL_Mode:     equ 40h  ; MASK: Enable/Disable PLL
+ 0018           OSC_CR0_Sleep:        equ 18h  ; MASK: Set Sleep timer freq/period
+ 0000           OSC_CR0_Sleep_512Hz:  equ 00h  ;     Set sleep bits for 1.95ms period
+ 0008           OSC_CR0_Sleep_64Hz:   equ 08h  ;     Set sleep bits for 15.6ms period
+ 0010           OSC_CR0_Sleep_8Hz:    equ 10h  ;     Set sleep bits for 125ms period
+ 0018           OSC_CR0_Sleep_1Hz:    equ 18h  ;     Set sleep bits for 1 sec period
+ 0007           OSC_CR0_CPU:          equ 07h  ; MASK: Set CPU Frequency
+ 0000           OSC_CR0_CPU_3MHz:     equ 00h  ;     set CPU Freq bits for 3MHz Operation
+ 0001           OSC_CR0_CPU_6MHz:     equ 01h  ;     set CPU Freq bits for 6MHz Operation
+ 0002           OSC_CR0_CPU_12MHz:    equ 02h  ;     set CPU Freq bits for 12MHz Operation
+ 0003           OSC_CR0_CPU_24MHz:    equ 03h  ;     set CPU Freq bits for 24MHz Operation
+ 0004           OSC_CR0_CPU_1d5MHz:   equ 04h  ;     set CPU Freq bits for 1.5MHz Operation
+ 0005           OSC_CR0_CPU_750kHz:   equ 05h  ;     set CPU Freq bits for 750kHz Operation
+ 0006           OSC_CR0_CPU_187d5kHz: equ 06h  ;     set CPU Freq bits for 187.5kHz Operation
+ 0007           OSC_CR0_CPU_93d7kHz:  equ 07h  ;     set CPU Freq bits for 93.7kHz Operation
+ 0000           
+ 00E1           OSC_CR1:      equ E1h          ; System V1/V2 Divider Control Register   (RW)
+ 00F0           OSC_CR1_V1:           equ F0h  ; MASK System V1 24MHz divider
+ 000F           OSC_CR1_V2:           equ 0Fh  ; MASK System V2 24MHz divider
+ 0000           
+ 0000           ;Reserved     equ E2h
+ 00E3           VLT_CR:       equ E3h          ; Voltage Monitor Control Register        (RW)
+ 0000           
+ 00E8           IMO_TR:       equ E8h          ; Internal Main Oscillator Trim Register  (WO)
+ 00E9           ILO_TR:       equ E9h          ; Internal Low-speed Oscillator Trim      (WO)
+ 00EA           BDG_TR:       equ EAh          ; Band Gap Trim Register                  (WO)
+ 00EB           ECO_TR:       equ EBh          ; External Oscillator Trim Register       (WO)
+ 0000           
+ 0000           
+ 0000           
+ 0000           ;;===================================
+ 0000           ;;      M8C System Macros
+ 0000           ;;===================================
+ 0000           
+ 0000           
+ 0000           ;-------------------------------
+ 0000           ;  Swapping Register Banks
+ 0000           ;-------------------------------
+ 0000           
+ 0000               macro M8C_SetBank0
+ 0000               and   F, ~FlagXIOMask
+ 0000               macro M8C_SetBank1
+ 0000               or    F, FlagXIOMask
+ 0000               macro M8C_EnableGInt
+ 0000               or    F, FlagGlobalIE
+ 0000               macro M8C_DisableGInt
+ 0000               and   F, ~FlagGlobalIE
+ 0001           DISABLE_INT_FIX:   equ   1
+ 0000           ;---------------------------------------------------
+ 0000           ;  Use the following macros to enable/disable
+ 0000           ;  either of the two global interrupt mask registers,
+ 0000           ;  INT_MSK0 or INT_MSK1.
+ 0000           ; 
+ 0000           ;  This is a fix to a noted problem in which an 
+ 0000           ;  inadvertant reset can occur if an interrupt occurs
+ 0000           ;  while clearing an interrupt mask bit.
+ 0000           ; 
+ 0000           ;  Usage:    M8C_DisableIntMask INT_MSKN, MASK
+ 0000           ;            M8C_EnableIntMask  INT_MSKN, MASK
+ 0000           ;            
+ 0000           ;  where INT_MSKN is INT_MSK0 or INT_MSK1 and
+ 0000           ;        MASK is the bit set to enable or disable
+ 0000           ;-------------------------------------------------
+ 0000           ; Disable Interrupt Bit Mask(s) 
+ 0000               macro M8C_DisableIntMask
+ 0000           if DISABLE_INT_FIX
+ 0000               mov   A, reg[CPU_SCR]           ; save the current Global interrupt state
+ 0000               M8C_DisableGInt                 ; disable global interrupts
+ 0000           endif
+ 0000               and   reg[@0], ~@1              ; disable specified interrupt enable bit
+ 0000           if DISABLE_INT_FIX
+ 0000               and   A, CPUSCR_GIEMask         ; determine if global interrupt was set
+ 0000               jz    . + 4                     ; jump if global interrupt disabled
+ 0000               M8C_EnableGInt                  ; set global interrupt
+ 0000           endif
+ 0000               macro M8C_EnableIntMask                             
+ 0000               or    reg[@0], @1              
+ 0000               macro M8C_EnableWatchDog
+ 0000               ; Clearing the Power-On Reset bit starts up the Watchdog timer
+ 0000               ; See the 25xxx/26xxx Family Datasheet, Section 9.3.4.
+ 0000               and   reg[CPU_SCR], ~CPUSCR_PORSMask & ~CPUSCR_WDRSMask
+ 0000               macro M8C_ClearWDT
+ 0000               mov   reg[RES_WDT], 00h
+ 0000               macro M8C_ClearWDTAndSleep
+ 0000               mov   reg[RES_WDT], 38h
+ 0000               macro M8C_Stall
+ 0000               or    reg[ASY_CR], ASY_CR_SYNCEN
+ 0000               macro M8C_Unstall
+ 0000               and   reg[ASY_CR], ~ASY_CR_SYNCEN
+ 0000               macro M8C_Sleep
+ 0000               or    reg[CPU_SCR], CPUSCR_SleepMask
+ 0000               ; The next instruction to be executed depends on the state of the
+ 0000               ; various interrupt enable bits. If some interrupts are enabled
+ 0000               ; and the global interrupts are disabled, the next instruction will
+ 0000               ; be the one that follows the invocation of this macro. If global
+ 0000               ; interrupts are also enabled then the next instruction will be
+ 0000               ; from the interrupt vector table. If no interrupts are enabled
+ 0000               ; then RIP.
+ 0000               macro M8C_Stop
+ 0000               ; In general, you probably don't want to do this, but here's how:
+ 0000               or    reg[CPU_SCR], CPUSCR_StopMask
+ 0000               ; Next instruction to be executed is located in the interrupt
+ 0000               ; vector table entry for Power-On Reset.
+ 0000               macro M8C_Reset
+ 0000               ; Restore everything to the power-on reset state.
+ 0000               mov A, 0
+ 0000               SSC
+ 0000               ; Next non-supervisor instruction will be at interrupt vector 0.
+ 0000               macro SSC
+ 0000               db 0
+ 0000           macro   lea
+ 0000                           mov             a,#>@0
+ 0000                           mov             x,#<@0
+ 0000           macro   loadabf
+ 0000                           push    a
+ 0000                           mov             a,[ABF_TMP]
+ 0000                           M8C_SetBank1
+ 0000                           mov             reg[ABF_CR],a
+ 0000                           M8C_SetBank0
+ 0000                           pop             a
+ 0000           macro   andabf
+ 0000                           and             [ABF_TMP],#@0
+ 0000                           loadabf
+ 0000           macro   orabf
+ 0000                           or              [ABF_TMP],#@0
+ 0000                           loadabf
+ 0000           macro   loadddr0
+ 0000                           push    a
+ 0000                           mov             a,[PRTDM0_T+0]
+ 0000                           mov             reg[PRT0DM0],a
+ 0000                           mov             a,[PRTDM1_T+0]
+ 0000                           mov             reg[PRT0DM1],a
+ 0000                           pop             a
+ 0000           macro   loadddr1
+ 0000                           push    a
+ 0000                           mov             a,[PRTDM0_T+1]
+ 0000                           mov             reg[PRT1DM0],a
+ 0000                           mov             a,[PRTDM1_T+1]
+ 0000                           mov             reg[PRT1DM1],a
+ 0000                           pop             a
+ 0000           macro   loadddr2
+ 0000                           push    a
+ 0000                           mov             a,[PRTDM0_T+2]
+ 0000                           mov             reg[PRT2DM0],a
+ 0000                           mov             a,[PRTDM1_T+2]
+ 0000                           mov             reg[PRT2DM1],a
+ 0000                           pop             a
+ 0000           macro   clc
+ 0000                           and             F,#~4
+ 0000           macro   sec
+ 0000                           or              F,#4
+ 0000           macro   echo
+ 0000                           push    a
+ 0000                           mov             a,#@0
+ 0000                           call    TxIN
+ 0000                           pop             a
+ 0010           MAXLINE:		equ		16				;number of characters in a line
+ 0000           
+ 0000           ;
+ 0000           ;Register memory usage
+ 0000           ;		
+                area bss(RAM)
+ 0000                   TMP:            blk     1                                       ;working register
+ 0001                   TMP2:           blk 1                                   ;working mask register
+ 0002                   TMP3:           blk     1                                       ;working index register
+ 0003                   ABF_TMP:        blk 1                                   ;stores current state of ABF_CR
+ 0004                   PRTDM0_T:       blk 3                                   ;stores current state of PRT0..2DM0
+ 0007                   PRTDM1_T:       blk     3                                       ;stores current state of PRT0..2DM1
+ 000A                   PORT:           blk 2                                   ;active port(s)
+ 000C                   NOSAMPLES:      blk 1                                   ;number of samples to take
+ 000D                   GAINK:          blk     1                                       ;gain constant
+ 000E                   RESULT:         blk 3                                   ;averaging accumulator
+ 0011                   SAMPLECLK:      blk 1                                   ;clock divider for ADC
+ 0012                   RX_STATUS:      blk 1                                   ;temp uart rx status
+ 0013                   COMMBUF:        blk MAXLINE                             ;incoming command storage
+ 0023                   RAMPADDING:     blk     64-(19+MAXLINE)         ;skip RX corruption area
+ 0040           
+ 0040           ;
+ 0040           ;Code memory
+ 0040           ;
+                area text(ROM,REL)
+                
+                                
+                ;
+                ;Analog input section
+                ;
+ 0000           DoubleEnded_OFF:        equ 0
+ 0001           DoubleEnded_LOWPOWER:   equ 1
+ 0002           DoubleEnded_MEDPOWER:   equ 2
+ 0003           DoubleEnded_HIGHPOWER:  equ 3
+ 0000           
+ 0000           DoubleEnded_G16_0:       equ 00h
+ 0010           DoubleEnded_G8_00:       equ 10h
+ 0020           DoubleEnded_G5_33:       equ 20h
+ 0030           DoubleEnded_G4_00:       equ 30h
+ 0040           DoubleEnded_G3_20:       equ 40h
+ 0050           DoubleEnded_G2_67:       equ 50h
+ 0060           DoubleEnded_G2_27:       equ 60h
+ 0070           DoubleEnded_G2_00:       equ 70h
+ 0000           
+ 0000           
+ 0000           
+ 0071           DoubleEnded_INV_CR0:    equ 71h
+ 0072           DoubleEnded_INV_CR1:    equ 72h
+ 0073           DoubleEnded_INV_CR2:    equ 73h
+ 0000           
+ 0075           DoubleEnded_NON_INV_CR0:    equ 75h
+ 0076           DoubleEnded_NON_INV_CR1:    equ 76h
+ 0077           DoubleEnded_NON_INV_CR2:    equ 77h
+ 0000           
+ 0000           Invert_OFF:        equ 0
+ 0001           Invert_LOWPOWER:   equ 1
+ 0002           Invert_MEDPOWER:   equ 2
+ 0003           Invert_HIGHPOWER:  equ 3
+ 0000           
+ 0000           Invert_G15_0:       equ 00h
+ 0010           Invert_G7_00:       equ 10h
+ 0020           Invert_G4_33:       equ 20h
+ 0030           Invert_G3_00:       equ 30h
+ 0040           Invert_G2_20:       equ 40h
+ 0050           Invert_G1_67:       equ 50h
+ 0060           Invert_G1_28:       equ 60h
+ 0070           Invert_G1_00:       equ 70h
+ 0080           Invert_G0_78:       equ 80h
+ 0090           Invert_G0_60:       equ 90h
+ 00A0           Invert_G0_46:       equ A0h
+ 00B0           Invert_G0_33:       equ B0h
+ 00C0           Invert_G0_23:       equ C0h
+ 00D0           Invert_G0_14:       equ D0h
+ 00E0           Invert_G0_06:       equ E0h
+ 0000           
+ 007D           Invert_INVAMP_CR0:  equ 7dh
+ 007E           Invert_INVAMP_CR1:  equ 7eh
+ 007F           Invert_INVAMP_CR2:  equ 7fh
+ 0000           SingleEnded_OFF:         equ 0
+ 0001           SingleEnded_LOWPOWER:    equ 1
+ 0002           SingleEnded_MEDPOWER:    equ 2
+ 0003           SingleEnded_HIGHPOWER:   equ 3
+ 0000           
+ 0008           SingleEnded_G16_0:       equ 08h
+ 0018           SingleEnded_G8_00:       equ 18h
+ 0028           SingleEnded_G5_33:       equ 28h
+ 0038           SingleEnded_G4_00:       equ 38h
+ 0048           SingleEnded_G3_20:       equ 48h
+ 0058           SingleEnded_G2_67:       equ 58h
+ 0068           SingleEnded_G2_27:       equ 68h
+ 0078           SingleEnded_G2_00:       equ 78h
+ 0088           SingleEnded_G1_78:       equ 88h
+ 0098           SingleEnded_G1_60:       equ 98h
+ 00A8           SingleEnded_G1_46:       equ A8h
+ 00B8           SingleEnded_G1_33:       equ B8h
+ 00C8           SingleEnded_G1_23:       equ C8h
+ 00D8           SingleEnded_G1_14:       equ D8h
+ 00E8           SingleEnded_G1_06:       equ E8h
+ 00F8           SingleEnded_G1_00:       equ F8h
+ 00E0           SingleEnded_G0_93:       equ E0h
+ 00D0           SingleEnded_G0_87:       equ D0h
+ 00C0           SingleEnded_G0_81:       equ C0h
+ 00B0           SingleEnded_G0_75:       equ B0h
+ 00A0           SingleEnded_G0_68:       equ A0h
+ 0090           SingleEnded_G0_62:       equ 90h
+ 0080           SingleEnded_G0_56:       equ 80h
+ 0070           SingleEnded_G0_50:       equ 70h
+ 0060           SingleEnded_G0_43:       equ 60h
+ 0050           SingleEnded_G0_37:       equ 50h
+ 0040           SingleEnded_G0_31:       equ 40h
+ 0030           SingleEnded_G0_25:       equ 30h
+ 0020           SingleEnded_G0_18:       equ 20h
+ 0010           SingleEnded_G0_12:       equ 10h
+ 0000           SingleEnded_G0_06:       equ 00h
+ 0000           
+ 0079           SingleEnded_GAIN_CR0:   equ 79h
+ 007A           SingleEnded_GAIN_CR1:   equ 7ah
+ 007B           SingleEnded_GAIN_CR2:   equ 7bh
+ 0000           
+ 0088           ADC_AtoDcr0:    equ 88h
+ 0089           ADC_AtoDcr1:    equ 89h
+ 008A           ADC_AtoDcr2:    equ 8ah
+ 008B           ADC_AtoDcr3:    equ 8bh
+ 0024           ADC_CounterFN:  equ 24h
+ 0025           ADC_CounterSL:  equ 25h
+ 0026           ADC_CounterOS:  equ 26h
+ 0024           ADC_CounterDR0: equ 24h
+ 0025           ADC_CounterDR1: equ 25h
+ 0026           ADC_CounterDR2: equ 26h
+ 0027           ADC_CounterCR0: equ 27h
+ 0020           ADC_TimerFN:    equ 20h
+ 0021           ADC_TimerSL:    equ 21h
+ 0022           ADC_TimerOS:    equ 22h
+ 0020           ADC_TimerDR0:   equ 20h
+ 0021           ADC_TimerDR1:   equ 21h
+ 0022           ADC_TimerDR2:   equ 22h
+ 0023           ADC_TimerCR0:   equ 23h
+ 0001           ADC_TimerMask:   equ  01h
+ 0002           ADC_CounterMask: equ  02h
+ 0000           ADC_OFF:         equ  0
+ 0001           ADC_LOWPOWER:    equ  1
+ 0002           ADC_MEDPOWER:    equ  2
+ 0003           ADC_HIGHPOWER:   equ  3
+ 000C           ADC_NUMBITS:     equ  12
+ 0001           ADC_NoAZ:        equ  1
+ 0000           HighByte:                     equ  0
+ 0001           LowByte:                      equ  1
+ 0000           
+ 0000           macro ADC_ISDATA
+ 0000              mov A,[ADC_fIncr]
+ 0000           macro ADC_GETDATA
+ 0000              mov X,[(ADC_iIncr + HighByte)]
+ 0000              mov A,[(ADC_iIncr + LowByte)]
+ 0000           macro ADC_CLEARFLAG
+ 0000              mov [ADC_fIncr],00h
+ 0000           MASK1LUT:
+ 0000 0102040810204080          db              1,2,4,8,16,32,64,128                    ;OR operation
+ 0008           MASK0LUT:
+ 0008 FEFDFBF7EFDFBF7F          db              ~1,~2,~4,~8,~16,~32,~64,~128    ;AND operation
+ 0010                           
+ 0010           ;               
+ 0010           ;Configure ADC for single ended input and initialise
+ 0010           ;
+ 0010           ;A=Input select P0[0]..P0[7]
+ 0010           ;GAINK = gain
+ 0010           ;
+ 0010           SingleEndedPort:
+ 0010 2107                      and             a,#7
+ 0012 5300                      mov             [TMP],a
+ 0014 6D                        rrc             a                                               ;check if port is odd or even
+ 0015 C045                      jc              OddPort
+ 0017           EvenPort:
+ 0017 5100                      mov             a,[TMP]
+ 0019 FFED                      index   MASK0LUT
+ 001B 5301                      mov             [TMP2],a
+ 001D 7110          or    F, FlagXIOMask
+ 001F 5104                      mov             a,[PRTDM0_T+0]
+ 0021 2201                      and             a,[TMP2]
+ 0023 6000                      mov             reg[PRT0DM0],a                  ;select high Z on that pin
+ 0025 5304                      mov             [PRTDM0_T+0],a                  ;update local latched value
+ 0027 5100                      mov             a,[TMP]
+ 0029 FFD5                      index   MASK1LUT
+ 002B 5301                      mov             [TMP2],a
+ 002D 5107                      mov             a,[PRTDM1_T+0]
+ 002F 2A01                      or              a,[TMP2]
+ 0031 6001                      mov             reg[PRT0DM1],a
+ 0033 5307                      mov             [PRTDM1_T+0],a
+ 0035           
+ 0035 2E0340                    or              [ABF_TMP],#40h
+ 0038 08                        push    a
+ 0039 5103                      mov             a,[ABF_TMP]
+ 003B 7110          or    F, FlagXIOMask
+ 003D 6062                      mov             reg[ABF_CR],a
+ 003F 70EF          and   F, ~FlagXIOMask
+ 0041 18                        pop             a
+ 0042 6B00                      rlc             [TMP]
+ 0044 6B00                      rlc             [TMP]
+ 0046 6B00                      rlc             [TMP]
+ 0048 6B00                      rlc             [TMP]
+ 004A 6B00                      rlc             [TMP]
+ 004C 2600C0                    and             [TMP],#128+64
+ 004F 70EF          and   F, ~FlagXIOMask
+ 0051 5D60                      mov             a,reg[AMX_IN]
+ 0053 213F                      and             a,#~(128+64)
+ 0055 2A00                      or              a,[TMP]
+ 0057 6060                      mov             reg[AMX_IN],a                           ;select even port
+ 0059 8021                      jmp             DonePort                                
+ 005B           OddPort:
+ 005B 2603BF                    and             [ABF_TMP],#~40h
+ 005E 08                        push    a
+ 005F 5103                      mov             a,[ABF_TMP]
+ 0061 7110          or    F, FlagXIOMask
+ 0063 6062                      mov             reg[ABF_CR],a
+ 0065 70EF          and   F, ~FlagXIOMask
+ 0067 18                        pop             a
+ 0068 6B00                      rlc             [TMP]
+ 006A 6B00                      rlc             [TMP]
+ 006C 6B00                      rlc             [TMP]
+ 006E 260030                    and             [TMP],#32+16
+ 0071 70EF          and   F, ~FlagXIOMask
+ 0073 5D60                      mov             a,reg[AMX_IN]                           ;select odd port
+ 0075 21CF                      and             a,#~(32+16)
+ 0077 2A00                      or              a,[TMP]
+ 0079 6060                      mov             reg[AMX_IN],a
+ 007B           DonePort:
+ 007B           		
+ 007B 5D7A                      mov             a,reg[ACA02CR1]
+ 007D 21E1                      and             a,#~(2+4+16+8)
+ 007F 2921                      or              a,#1+32                                         ;select column input wrt ACA02
+ 0081 607A                      mov             reg[ACA02CR1],a
+ 0083                           
+ 0083 510D                      mov             a,[GAINK]
+ 0085 9000                      call    SingleEnded_SetGain                     ;user selected gain
+ 0087 5002                      mov             a,#SingleEnded_MEDPOWER
+ 0089 9000                      call    SingleEnded_Start               
+ 008B                           
+ 008B 7C0000                    lcall   Invert_Stop                                     ;shut down inverting amp
+ 008E 7C0000                    lcall   DoubleEnded_Stop                        ;shut down balanced amp
+ 0091                                   
+ 0091 70EF          and   F, ~FlagXIOMask
+ 0093 41891F                    and             reg[ASA12CR1],#~(128+64+32)     ;select ASA12 input for ACA02
+ 0096                                                                                                                                                           
+ 0096                           
+ 0096 70FB                      and             F,#~4
+ 0098 7F                        ret
+ 0099           
+ 0099           ;               
+ 0099           ;Configure ADC for single ended inverted input and initialise
+ 0099           ;
+ 0099           ;A=Input select P0[0]..P0[7]
+ 0099           ;GAINK = gain
+ 0099           ;
+ 0099           SingleEndedInvPort:
+ 0099 2107                      and             a,#7
+ 009B 5300                      mov             [TMP],a
+ 009D 6D                        rrc             a                                               ;check if port is odd or even
+ 009E C045                      jc              OddPort2
+ 00A0           EvenPort2:
+ 00A0 5100                      mov             a,[TMP]
+ 00A2 FF64                      index   MASK0LUT
+ 00A4 5301                      mov             [TMP2],a
+ 00A6 7110          or    F, FlagXIOMask
+ 00A8 5104                      mov             a,[PRTDM0_T+0]
+ 00AA 2201                      and             a,[TMP2]
+ 00AC 6000                      mov             reg[PRT0DM0],a                  ;select high Z on that pin
+ 00AE 5304                      mov             [PRTDM0_T+0],a
+ 00B0 5100                      mov             a,[TMP]
+ 00B2 FF4C                      index   MASK1LUT
+ 00B4 5301                      mov             [TMP2],a
+ 00B6 5107                      mov             a,[PRTDM1_T+0]
+ 00B8 2A01                      or              a,[TMP2]
+ 00BA 6001                      mov             reg[PRT0DM1],a
+ 00BC 5307                      mov             [PRTDM1_T+0],a
+ 00BE           
+ 00BE 2E0340                    or              [ABF_TMP],#40h
+ 00C1 08                        push    a
+ 00C2 5103                      mov             a,[ABF_TMP]
+ 00C4 7110          or    F, FlagXIOMask
+ 00C6 6062                      mov             reg[ABF_CR],a
+ 00C8 70EF          and   F, ~FlagXIOMask
+ 00CA 18                        pop             a
+ 00CB 6B00                      rlc             [TMP]
+ 00CD 6B00                      rlc             [TMP]
+ 00CF 6B00                      rlc             [TMP]
+ 00D1 6B00                      rlc             [TMP]
+ 00D3 6B00                      rlc             [TMP]
+ 00D5 2600C0                    and             [TMP],#128+64
+ 00D8 70EF          and   F, ~FlagXIOMask
+ 00DA 5D60                      mov             a,reg[AMX_IN]
+ 00DC 213F                      and             a,#~(128+64)
+ 00DE 2A00                      or              a,[TMP]
+ 00E0 6060                      mov             reg[AMX_IN],a                           ;select even port
+ 00E2 8021                      jmp             DonePort2
+ 00E4           OddPort2:
+ 00E4 2603BF                    and             [ABF_TMP],#~40h
+ 00E7 08                        push    a
+ 00E8 5103                      mov             a,[ABF_TMP]
+ 00EA 7110          or    F, FlagXIOMask
+ 00EC 6062                      mov             reg[ABF_CR],a
+ 00EE 70EF          and   F, ~FlagXIOMask
+ 00F0 18                        pop             a
+ 00F1 6B00                      rlc             [TMP]
+ 00F3 6B00                      rlc             [TMP]
+ 00F5 6B00                      rlc             [TMP]
+ 00F7 260030                    and             [TMP],#32+16
+ 00FA 70EF          and   F, ~FlagXIOMask
+ 00FC 5D60                      mov             a,reg[AMX_IN]                           ;select odd port
+ 00FE 21CF                      and             a,#~(32+16)
+ 0100 2A00                      or              a,[TMP]
+ 0102 6060                      mov             reg[AMX_IN],a
+ 0104           DonePort2:
+ 0104           		
+ 0104 5D7A                      mov             a,reg[ACA02CR1]
+ 0106 21C1                      and             a,#~(2+4+16+32+8)
+ 0108 2921                      or              a,#1+32                                         ;select column input
+ 010A 607A                      mov             reg[ACA02CR1],a
+ 010C                           
+ 010C 510D                      mov             a,[GAINK]
+ 010E 9000                      call    SingleEnded_SetGain                     ;user selected gain
+ 0110 5002                      mov             a,#SingleEnded_MEDPOWER
+ 0112 9000                      call    SingleEnded_Start               
+ 0114                           
+ 0114 5002                      mov             a,#Invert_MEDPOWER
+ 0116 7C0000                    lcall   Invert_Start                            ;start inverting amp
+ 0119 5070                      mov             a,#Invert_G1_00                         ;gain = -1.0
+ 011B 7C0000                    lcall   Invert_SetGain
+ 011E 7C0000                    lcall   DoubleEnded_Stop                        ;shut down balanced amp
+ 0121                                   
+ 0121 70EF          and   F, ~FlagXIOMask
+ 0123 41899F                    and             reg[ASA12CR1],#~(64+32)         ;select ASA12 input for ACA03
+ 0126 438980                    or              reg[ASA12CR1],#128
+ 0129                                                                                                                                   
+ 0129                           
+ 0129 70FB                      and             F,#~4
+ 012B 7F                        ret
+ 012C           ;
+ 012C           ;Configure ADC for double ended input and initialise
+ 012C           ;               
+ 012C           ;A.MSN  = V+ input P0[0]..P0[7]
+ 012C           ;A.LSN  = V- input P0[0]..P0[7]
+ 012C           ;GAINK  = Gain
+ 012C           ;
+ 012C           ;Carry is clear if configuration is possible
+ 012C           ;
+ 012C           DoubleEndedPort:
+ 012C           		
+ 012C 5300                      mov             [TMP],a
+ 012E                           
+ 012E 2107                      and             a,#7
+ 0130 FED6                      index   MASK0LUT
+ 0132 5301                      mov             [TMP2],a
+ 0134 7110          or    F, FlagXIOMask
+ 0136 5104                      mov             a,[PRTDM0_T+0]
+ 0138 2201                      and             a,[TMP2]
+ 013A 6000                      mov             reg[PRT0DM0],a                  ;select high Z on that V- input
+ 013C 5304                      mov             [PRTDM0_T+0],a
+ 013E 5100                      mov             a,[TMP]
+ 0140 2107                      and             a,#7
+ 0142 FEBC                      index   MASK1LUT
+ 0144 5301                      mov             [TMP2],a
+ 0146 5107                      mov             a,[PRTDM1_T+0]
+ 0148 2A01                      or              a,[TMP2]
+ 014A 6001                      mov             reg[PRT0DM1],a
+ 014C 5307                      mov             [PRTDM1_T+0],a
+ 014E                           
+ 014E 5300                      mov             [TMP],a
+ 0150 6D                        rrc             a
+ 0151 6D                        rrc             a
+ 0152 6D                        rrc             a
+ 0153 6D                        rrc             a
+ 0154 2107                      and             a,#7
+ 0156 FEB0                      index   MASK0LUT
+ 0158 5301                      mov             [TMP2],a
+ 015A 7110          or    F, FlagXIOMask
+ 015C 5104                      mov             a,[PRTDM0_T+0]
+ 015E 2201                      and             a,[TMP2]
+ 0160 6000                      mov             reg[PRT0DM0],a                  ;select high Z on that V+ input
+ 0162 5304                      mov             [PRTDM0_T+0],a
+ 0164 5100                      mov             a,[TMP]
+ 0166 6D                        rrc             a
+ 0167 6D                        rrc             a
+ 0168 6D                        rrc             a
+ 0169 6D                        rrc             a
+ 016A 2107                      and             a,#7
+ 016C FE92                      index   MASK1LUT
+ 016E 5301                      mov             [TMP2],a
+ 0170 5107                      mov             a,[PRTDM1_T+0]
+ 0172 2A01                      or              a,[TMP2]
+ 0174 6001                      mov             reg[PRT0DM1],a
+ 0176 5307                      mov             [PRTDM1_T+0],a
+ 0178                                   
+ 0178 470001                    tst             [TMP],#1                        ;check if V+ and V- are even/odd or odd/even
+ 017B B020                      jnz             NegIsOdd
+ 017D           NegIsEven:		
+ 017D           
+ 017D 470010                    tst             [TMP],#16
+ 0180 A023                      jz              InvalidConfig
+ 0182           
+ 0182 2E0101                    or              [TMP2],#1                       ;use invert
+ 0185           
+ 0185 5100                      mov             a,[TMP]
+ 0187 6B00                      rlc             [TMP]   
+ 0189 6B00                      rlc             [TMP]   
+ 018B 6B00                      rlc             [TMP]   
+ 018D 6B00                      rlc             [TMP]   
+ 018F 2600F0                    and             [TMP],#240
+ 0192 6D                        rrc             a
+ 0193 6D                        rrc             a
+ 0194 6D                        rrc             a
+ 0195 6D                        rrc             a
+ 0196 210F                      and             a,#15
+ 0198 2C00                      or              [TMP],a                         ;swap nibbles
+ 019A 800C                      jmp             ValidConfig
+ 019C                                                           
+ 019C           NegIsOdd:
+ 019C           
+ 019C 2601FE                    and             [TMP2],#~1                      ;don't use invert
+ 019F 470010                    tst             [TMP],#16
+ 01A2 A004                      jz              ValidConfig
+ 01A4           InvalidConfig:
+ 01A4 7104                      or              F,#4
+ 01A6 7F                        ret                                                     ;both odd.. error!
+ 01A7           
+ 01A7           ValidConfig:
+ 01A7 70EF          and   F, ~FlagXIOMask
+ 01A9 5D60                      mov             a,reg[AMX_IN]   
+ 01AB 21FC                      and             a,#~(1+2)                       ;mask column 0 (V-) mux select
+ 01AD 470002                    tst             [TMP],#2
+ 01B0 A003                      jz              NoSet0
+ 01B2 2901                      or              a,#1
+ 01B4           NoSet0:
+ 01B4 470004                    tst             [TMP],#4
+ 01B7 A003                      jz              NoSet1
+ 01B9 2902                      or              a,#2
+ 01BB           NoSet1:
+ 01BB 21F3                      and             a,#~(4+8)                       ;mask column 1 (V+) mux select
+ 01BD 470020                    tst             [TMP],#32
+ 01C0 A003                      jz              NoSet2
+ 01C2 2904                      or              a,#4
+ 01C4           NoSet2:
+ 01C4 470040                    tst             [TMP],#64
+ 01C7 A003                      jz              NoSet3
+ 01C9 2908                      or              a,#8
+ 01CB           NoSet3:
+ 01CB 6060                      mov             reg[AMX_IN],a
+ 01CD                           
+ 01CD 5002                      mov             a,#DoubleEnded_MEDPOWER         ;power up differential amp
+ 01CF 7C0000                    lcall   DoubleEnded_Start
+ 01D2 5070                      mov             a,#DoubleEnded_G2_00            ;nominal gain of 2.0
+ 01D4 7C0000                    lcall   DoubleEnded_SetGain
+ 01D7                           
+ 01D7 70EF          and   F, ~FlagXIOMask
+ 01D9 417AE0                    and             reg[ACA02CR1],#~(1+2+4+16+8)            ;select ACA02 input to ACA01/AGND
+ 01DC 437A20                    or              reg[ACA02CR1],#32
+ 01DF                           
+ 01DF 510D                      mov             a,[GAINK]
+ 01E1 9000                      call    SingleEnded_SetGain                     ;user selected gain
+ 01E3 5002                      mov             a,#SingleEnded_MEDPOWER
+ 01E5 9000                      call    SingleEnded_Start                       ;power up cascade opamp
+ 01E7           
+ 01E7 470101                    tst             [TMP2],#1                                       ;invert enabled?
+ 01EA B00B                      jnz             InvertOn                                        ;yes, turn it on
+ 01EC                                                                           
+ 01EC           InvertOff:
+ 01EC           
+ 01EC 70EF          and   F, ~FlagXIOMask
+ 01EE 41891F                    and             reg[ASA12CR1],#~(128+64+32)     ;select ASA12 input for ACA02
+ 01F1                                                                                                                           
+ 01F1                                                                                                   
+ 01F1 7C0000                    lcall   Invert_Stop                                     ;shut down unused opamp
+ 01F4 8012                      jmp             InvertDone
+ 01F6                           
+ 01F6           InvertOn:
+ 01F6           
+ 01F6 70EF          and   F, ~FlagXIOMask
+ 01F8 438980                    or              reg[ASA12CR1],#128
+ 01FB 41899F                    and             reg[ASA12CR1],#~(64+32)         ;select ASA12 input to ACA03
+ 01FE                                                                                                                                                                                   
+ 01FE                                                   
+ 01FE 5002                      mov             a,#Invert_MEDPOWER
+ 0200 7C0000                    lcall   Invert_SetGain                          ;nominal gain of 1.0
+ 0203 5070                      mov             a,#Invert_G1_00
+ 0205 9000                      call    Invert_Start    
+ 0207           
+ 0207           InvertDone:
+ 0207           
+ 0207 70FB                      and             F,#~4
+ 0209 7F                        ret
+ 020A           
+ 020A           ;
+ 020A           ;Initialise ADC and sample clock
+ 020A           ;               
+ 020A           ;Sample rate = Data clock / (65*256)    must be between 7.8 and 480 
+ 020A           ;
+ 020A           InitADC:
+ 020A 550C01                    mov             [NOSAMPLES],#1
+ 020D 551119                    mov             [SAMPLECLK],#25                         ;57 hz
+ 0210 9000                      call    SampleCLK_DisableInt
+ 0212 7C0000                    lcall   ADC_Stop
+ 0215 7C0000                    lcall   Invert_Stop
+ 0218 9000                      call    SingleEnded_Stop
+ 021A 7C0000                    lcall   DoubleEnded_Stop
+ 021D 7F                        ret
+ 021E                           
+ 021E           ;
+ 021E           ;Initialise ADC and take some samples, apply averaging filter
+ 021E           ;               
+ 021E           ;Sample rate = Data clock / (65*256)    must be between 7.8 and 480 
+ 021E           ;
+ 021E           ;Carry is set if sample rate is invalid
+ 021E           ;
+ 021E           ;Returns data in X:A
+ 021E           ;
+ 021E           RunADC:		
+ 021E 3C0C00                    cmp             [NOSAMPLES],#0
+ 0221 A00D                      jz              ADCInvalid
+ 0223 5111                      mov             a,[SAMPLECLK]
+ 0225 3903                      cmp             a,#3
+ 0227 C007                      jc              ADCInvalid
+ 0229 5111                      mov             a,[SAMPLECLK]
+ 022B 39B8                      cmp             a,#184
+ 022D C004                      jc              ADCOK
+ 022F           ADCInvalid:
+ 022F 7104                      or              F,#4
+ 0231 7F                        ret
+ 0232           ADCOK:	
+ 0232           
+ 0232 9000                      call    SampleCLK_WritePeriod
+ 0234                           
+ 0234 5111                      mov             a,[SAMPLECLK]
+ 0236 70FB                      and             F,#~4
+ 0238 6D                        rrc             a                                                       ;compare = 50% duty
+ 0239 9000                      call    SampleCLK_WriteCompareValue
+ 023B 9000                      call    SampleCLK_Start
+ 023D                           
+ 023D 5003                      mov             a,#ADC_HIGHPOWER
+ 023F 7C0000                    lcall   ADC_Start
+ 0242           
+ 0242 957D                      call    SettleDelay
+ 0244                           
+ 0244 550E00                    mov             [RESULT],#0
+ 0247 550F00                    mov             [RESULT+1],#0
+ 024A 551000                    mov             [RESULT+2],#0                           ;reset accumulator
+ 024D                           
+ 024D 510C                      mov             a,[NOSAMPLES]                           ;how many samples
+ 024F 5301                      mov             [TMP2],a
+ 0251 7C0000                    lcall   ADC_GetSamples                          ;start sampler
+ 0254                           
+ 0254           LoopADC:
+ 0254 5100         mov A,[ADC_fIncr]
+ 0256 AFFD              jz              LoopADC                         ;wait for ADC
+ 0258 550000       mov [ADC_fIncr],00h
+ 025B                   
+ 025B 5800         mov X,[(ADC_iIncr + HighByte)]
+ 025D 5101         mov A,[(ADC_iIncr + LowByte)]
+ 025F 4B                swap    a,x
+ 0260 0108              add             a,8                                     ;convert to unsigned
+ 0262 4B                swap    a,x
+ 0263 040E                      add             [RESULT],a
+ 0265 4B                        swap    a,x
+ 0266 0C0F                      adc             [RESULT+1],a
+ 0268 0E1000                    adc             [RESULT+2],#0
+ 026B 7A01                      dec             [TMP2]
+ 026D BFE6                      jnz             LoopADC
+ 026F           
+ 026F 7C0000                    lcall   ADC_Stop
+ 0272           
+ 0272 3C0C01                    cmp             [NOSAMPLES],#1
+ 0275 A03D                      jz              SkipDiv                         ;any need to divide?
+ 0277           
+ 0277           ;               
+ 0277           ;Divide 24-bit result by number of 8-bit number of samples
+ 0277           ;
+ 0277 550118                    mov             [TMP2],#24
+ 027A 550000                    mov             [TMP],#0
+ 027D 70FB                      and             F,#~4
+ 027F           DivLoop:
+ 027F 6B0E                      rlc             [RESULT]
+ 0281 6B0F                      rlc             [RESULT+1]
+ 0283 6B10                      rlc             [RESULT+2]
+ 0285 6B00                      rlc             [TMP]
+ 0287 C011                      jc              DivOver
+ 0289 5100                      mov             a,[TMP]
+ 028B 120C                      sub             a,[NOSAMPLES]
+ 028D C017                      jc              DivUnder
+ 028F 5300                      mov             [TMP],a
+ 0291 7A01                      dec             [TMP2]
+ 0293 A019                      jz              DivDone
+ 0295 7104                      or              F,#4
+ 0297 8FE7                      jmp             DivLoop
+ 0299                           
+ 0299           DivOver:
+ 0299 510C                      mov             a,[NOSAMPLES]
+ 029B 1400                      sub             [TMP],a
+ 029D 7A01                      dec             [TMP2]
+ 029F A00D                      jz              DivDone
+ 02A1 7104                      or              F,#4
+ 02A3 8FDB                      jmp             DivLoop
+ 02A5                           
+ 02A5           DivUnder:
+ 02A5 7A01                      dec             [TMP2]
+ 02A7 A005                      jz              DivDone
+ 02A9 70FB                      and             F,#~4
+ 02AB 8FD3                      jmp             DivLoop
+ 02AD           
+ 02AD           DivDone:
+ 02AD 6B0E                      rlc             [RESULT]
+ 02AF 6B0F                      rlc             [RESULT+1]
+ 02B1 6B10                      rlc             [RESULT+2]
+ 02B3           SkipDiv:
+ 02B3 160F08                    sub             [RESULT+1],8
+ 02B6 510E                      mov             a,[RESULT]
+ 02B8 580F                      mov             x,[RESULT+1]            
+ 02BA 70FB                      and             F,#~4
+ 02BC 7F                        ret
+ 02BD                           
+ 02BD           
+ 02BD           ;
+ 02BD           ;Digital input/output section
+ 02BD           ;
+ 02BD           
+ 02BD           ;
+ 02BD           ;Set data direction on pin for strong drive
+ 02BD           ;
+ 02BD           ;Inputs:        A=Port / Bit
+ 02BD           ;
+ 02BD           ;Outputs:       X=Port Offset
+ 02BD           ;                       A=Port / Bit
+ 02BD           ;
+ 02BD           SetDDROut:
+ 02BD 5300                      mov             [TMP],a
+ 02BF 6D                        rrc             a
+ 02C0 6D                        rrc             a
+ 02C1 6D                        rrc             a               
+ 02C2 2103                      and             a,#3                            ;port number
+ 02C4 4B                        swap    a,x
+ 02C5 5100                      mov             a,[TMP]
+ 02C7 2107                      and             a,#7
+ 02C9 FD35                      index   MASK1LUT                        ;lookup mask for OR'ing
+ 02CB 5301                      mov             [TMP2],a
+ 02CD 7110          or    F, FlagXIOMask
+ 02CF 5204                      mov             a,[X+PRTDM0_T]
+ 02D1 2A01                      or              a,[TMP2]
+ 02D3 6100                      mov             reg[X+PRT0DM0],a
+ 02D5 5404                      mov             [X+PRTDM0_T],a
+ 02D7 5100                      mov             a,[TMP]
+ 02D9 5007                      mov             a,#7
+ 02DB FD2B                      index   MASK0LUT
+ 02DD 5301                      mov             [TMP2],a
+ 02DF 5207                      mov             a,[X+PRTDM1_T]
+ 02E1 2201                      and             a,[TMP2]
+ 02E3 6101                      mov             reg[X+PRT0DM1],a        ;strong drive
+ 02E5 5407                      mov             [X+PRTDM1_T],a
+ 02E7 5100                      mov             a,[TMP]
+ 02E9 70EF          and   F, ~FlagXIOMask
+ 02EB 7F                        ret
+ 02EC           
+ 02EC           ;
+ 02EC           ;Set data direction on pin for pulldown
+ 02EC           ;
+ 02EC           ;Inputs:        A=Port / Bit
+ 02EC           ;
+ 02EC           ;Outputs:       X=Port Offset
+ 02EC           ;                       A=Port / Bit
+ 02EC           ;
+ 02EC           SetDDRPulldown:
+ 02EC 5300                      mov             [TMP],a
+ 02EE 6D                        rrc             a
+ 02EF 6D                        rrc             a
+ 02F0 6D                        rrc             a               
+ 02F1 2103                      and             a,#3                            ;port number
+ 02F3 4B                        swap    a,x
+ 02F4 5100                      mov             a,[TMP]
+ 02F6 2107                      and             a,#7
+ 02F8 FD0E                      index   MASK0LUT                        ;lookup mask for AND'ing
+ 02FA 5301                      mov             [TMP2],a
+ 02FC 7110          or    F, FlagXIOMask
+ 02FE 5204                      mov             a,[X+PRTDM0_T]
+ 0300 2201                      and             a,[TMP2]
+ 0302 6100                      mov             reg[X+PRT0DM0],a
+ 0304 5404                      mov             [X+PRTDM0_T],a
+ 0306 5207                      mov             a,[X+PRTDM1_T]
+ 0308 2201                      and             a,[TMP2]
+ 030A 6101                      mov             reg[X+PRT0DM1],a        ;pulldown
+ 030C 5407                      mov             [X+PRTDM1_T],a
+ 030E 5100                      mov             a,[TMP]
+ 0310 70EF          and   F, ~FlagXIOMask
+ 0312 94AD                      call    SettleDelay
+ 0314 7F                        ret
+ 0315           
+ 0315           ;
+ 0315           ;Set data direction on pin for pullup
+ 0315           ;
+ 0315           ;Inputs:        A=Port / Bit
+ 0315           ;
+ 0315           ;Outputs:       X=Port Offset
+ 0315           ;                       A=Port / Bit
+ 0315           ;
+ 0315           SetDDRPullup:
+ 0315 5300                      mov             [TMP],a
+ 0317 6D                        rrc             a
+ 0318 6D                        rrc             a
+ 0319 6D                        rrc             a               
+ 031A 2103                      and             a,#3                            ;port number
+ 031C 4B                        swap    a,x
+ 031D 5100                      mov             a,[TMP]
+ 031F 2107                      and             a,#7
+ 0321 FCDD                      index   MASK1LUT                        ;lookup mask for OR'ing
+ 0323 5301                      mov             [TMP2],a
+ 0325 7110          or    F, FlagXIOMask
+ 0327 5204                      mov             a,[X+PRTDM0_T]
+ 0329 2A01                      or              a,[TMP2]
+ 032B 6100                      mov             reg[X+PRT0DM0],a
+ 032D 5404                      mov             [X+PRTDM0_T],a
+ 032F 5207                      mov             a,[X+PRTDM1_T]
+ 0331 2A01                      or              a,[TMP2]
+ 0333 6101                      mov             reg[X+PRT0DM1],a        ;pullup
+ 0335 5407                      mov             [X+PRTDM1_T],a
+ 0337 5100                      mov             a,[TMP]
+ 0339 70EF          and   F, ~FlagXIOMask
+ 033B 9484                      call    SettleDelay
+ 033D 7F                        ret
+ 033E           
+ 033E           ;
+ 033E           ;Set data direction on pin for high Z input
+ 033E           ;
+ 033E           ;Inputs:        A=Port / Bit
+ 033E           ;
+ 033E           ;Outputs:       X=Port Offset
+ 033E           ;                       A=Port / Bit
+ 033E           ;
+ 033E           SetDDRIn:
+ 033E 5300                      mov             [TMP],a
+ 0340 6D                        rrc             a
+ 0341 6D                        rrc             a
+ 0342 6D                        rrc             a               
+ 0343 2103                      and             a,#3                            ;port number
+ 0345 4B                        swap    a,x
+ 0346 5100                      mov             a,[TMP]
+ 0348 2107                      and             a,#7
+ 034A FCBC                      index   MASK0LUT                        ;lookup mask
+ 034C 5301                      mov             [TMP2],a
+ 034E 7110          or    F, FlagXIOMask
+ 0350 5204                      mov             a,[X+PRTDM0_T]
+ 0352 2201                      and             a,[TMP2]
+ 0354 6100                      mov             reg[X+PRT0DM0],a
+ 0356 5404                      mov             [X+PRTDM0_T],a
+ 0358 5100                      mov             a,[TMP]
+ 035A 5007                      mov             a,#7
+ 035C FCA2                      index   MASK1LUT
+ 035E 5301                      mov             [TMP2],a
+ 0360 5207                      mov             a,[X+PRTDM1_T]
+ 0362 2A01                      or              a,[TMP2]
+ 0364 6101                      mov             reg[X+PRT0DM1],a        ;high Z
+ 0366 5407                      mov             [X+PRTDM1_T],a
+ 0368 5100                      mov             a,[TMP]
+ 036A 70EF          and   F, ~FlagXIOMask
+ 036C 9453                      call    SettleDelay
+ 036E 7F                        ret
+ 036F                                           
+ 036F           ;
+ 036F           ;Drive digital output high
+ 036F           ;               
+ 036F           ;A      P0[0]..P2[7]
+ 036F           ;
+ 036F           SetDigitalOutput:
+ 036F 2107                      and             a,#7
+ 0371 FC8D                      index   MASK1LUT
+ 0373 5301                      mov             [TMP2],a                        ;lookup bit
+ 0375 70EF          and   F, ~FlagXIOMask
+ 0377 6100                      mov             reg[X+PRT0DR],a
+ 0379 2A01                      or              a,[TMP2]
+ 037B 5E00                      mov             a,reg[X+PRT0DR]         ;set bit                                
+ 037D 7F                        ret             
+ 037E                           
+ 037E           ;
+ 037E           ;Drive digital output low
+ 037E           ;               
+ 037E           ;A      P0[0]..P2[7]
+ 037E           ;
+ 037E           ClrDigitalOutput:
+ 037E 2107                      and             a,#7
+ 0380 FC86                      index   MASK0LUT
+ 0382 5301                      mov             [TMP2],a                        ;lookup bit
+ 0384 70EF          and   F, ~FlagXIOMask
+ 0386 6100                      mov             reg[X+PRT0DR],a
+ 0388 2201                      and             a,[TMP2]
+ 038A 5E00                      mov             a,reg[X+PRT0DR]         ;clear bit                              
+ 038C 7F                        ret             
+ 038D                           
+ 038D           ;
+ 038D           ;Read digital input
+ 038D           ;
+ 038D           ;A      P0[0]..P2[7]
+ 038D           ;
+ 038D           ;Returns result in Z (Z=1 if bit is clear)
+ 038D           ;
+ 038D           ReadDigitalInput:
+ 038D 2107                      and             a,#7
+ 038F FC6F                      index   MASK1LUT
+ 0391 5301                      mov             [TMP2],a
+ 0393 70EF          and   F, ~FlagXIOMask
+ 0395 5E00                      mov             a,reg[X+PRT0DR]
+ 0397 2201                      and             a,[TMP2]
+ 0399 7F                        ret
+ 039A           ;
+ 039A           ;Analog output section (DAC6)
+ 039A           ;
+ 0000           DAC_P02_OFF:              equ 00h
+ 0001           DAC_P02_LOWPOWER:         equ 01h
+ 0002           DAC_P02_MEDPOWER:         equ 02h
+ 0003           DAC_P02_HIGHPOWER:        equ 03h
+ 039A           
+ 009C           DAC_P02_CR0:              equ 9ch
+ 009D           DAC_P02_CR1:              equ 9dh
+ 009E           DAC_P02_CR2:              equ 9eh
+ 009F           DAC_P02_CR3:              equ 9fh
+ 039A           
+ 0004           DAC_P02_OffsetBinary:     equ 04h
+ 0002           DAC_P02_TwosComplement:   equ 02h
+ 0001           DAC_P02_SignAndMagnitude: equ 01h
+ 0000           DAC_P02_RawRegister:      equ 00h
+ 039A           
+ 0007           DAC_P02_DATAFORMAT:       equ 7h
+ 0004           DAC_P02_OFFSETBINARY:     equ DAC_P02_DATAFORMAT & DAC_P02_OffsetBinary
+ 0002           DAC_P02_TWOSCOMPLEMENT:   equ DAC_P02_DATAFORMAT & DAC_P02_TwosComplement
+ 0001           DAC_P02_SIGNANDMAGNITUDE: equ DAC_P02_DATAFORMAT & DAC_P02_SignAndMagnitude
+ 039A           
+ 0000           DAC_P02_PHASE_Normal:     equ 0
+ 0001           DAC_P02_PHASE_Swapped:    equ 1
+ 0000           DAC_P02_PHASE_SWAP:       equ DAC_P02_PHASE_Normal
+ 039A           
+                IF DAC_P02_PHASE_SWAP
+                    DAC_P02_CR0_HIBITS:   equ C0h
+                ELSE
+ 0080               DAC_P02_CR0_HIBITS:   equ 80h
+                ENDIF
+ 0000           DAC_P03_OFF:              equ 00h
+ 0001           DAC_P03_LOWPOWER:         equ 01h
+ 0002           DAC_P03_MEDPOWER:         equ 02h
+ 0003           DAC_P03_HIGHPOWER:        equ 03h
+ 039A           
+ 0090           DAC_P03_CR0:              equ 90h
+ 0091           DAC_P03_CR1:              equ 91h
+ 0092           DAC_P03_CR2:              equ 92h
+ 0093           DAC_P03_CR3:              equ 93h
+ 039A           
+ 0004           DAC_P03_OffsetBinary:     equ 04h
+ 0002           DAC_P03_TwosComplement:   equ 02h
+ 0001           DAC_P03_SignAndMagnitude: equ 01h
+ 0000           DAC_P03_RawRegister:      equ 00h
+ 039A           
+ 0007           DAC_P03_DATAFORMAT:       equ 7h
+ 0004           DAC_P03_OFFSETBINARY:     equ DAC_P03_DATAFORMAT & DAC_P03_OffsetBinary
+ 0002           DAC_P03_TWOSCOMPLEMENT:   equ DAC_P03_DATAFORMAT & DAC_P03_TwosComplement
+ 0001           DAC_P03_SIGNANDMAGNITUDE: equ DAC_P03_DATAFORMAT & DAC_P03_SignAndMagnitude
+ 039A           
+ 0000           DAC_P03_PHASE_Normal:     equ 0
+ 0001           DAC_P03_PHASE_Swapped:    equ 1
+ 0000           DAC_P03_PHASE_SWAP:       equ DAC_P03_PHASE_Normal
+ 039A           
+                IF DAC_P03_PHASE_SWAP
+                    DAC_P03_CR0_HIBITS:   equ C0h
+                ELSE
+ 0080               DAC_P03_CR0_HIBITS:   equ 80h
+                ENDIF
+ 0000           DAC_P04_OFF:              equ 00h
+ 0001           DAC_P04_LOWPOWER:         equ 01h
+ 0002           DAC_P04_MEDPOWER:         equ 02h
+ 0003           DAC_P04_HIGHPOWER:        equ 03h
+ 039A           
+ 0098           DAC_P04_CR0:              equ 98h
+ 0099           DAC_P04_CR1:              equ 99h
+ 009A           DAC_P04_CR2:              equ 9ah
+ 009B           DAC_P04_CR3:              equ 9bh
+ 039A           
+ 0004           DAC_P04_OffsetBinary:     equ 04h
+ 0002           DAC_P04_TwosComplement:   equ 02h
+ 0001           DAC_P04_SignAndMagnitude: equ 01h
+ 0000           DAC_P04_RawRegister:      equ 00h
+ 039A           
+ 0007           DAC_P04_DATAFORMAT:       equ 7h
+ 0004           DAC_P04_OFFSETBINARY:     equ DAC_P04_DATAFORMAT & DAC_P04_OffsetBinary
+ 0002           DAC_P04_TWOSCOMPLEMENT:   equ DAC_P04_DATAFORMAT & DAC_P04_TwosComplement
+ 0001           DAC_P04_SIGNANDMAGNITUDE: equ DAC_P04_DATAFORMAT & DAC_P04_SignAndMagnitude
+ 039A           
+ 0000           DAC_P04_PHASE_Normal:     equ 0
+ 0001           DAC_P04_PHASE_Swapped:    equ 1
+ 0000           DAC_P04_PHASE_SWAP:       equ DAC_P04_PHASE_Normal
+ 039A           
+                IF DAC_P04_PHASE_SWAP
+                    DAC_P04_CR0_HIBITS:   equ C0h
+                ELSE
+ 0080               DAC_P04_CR0_HIBITS:   equ 80h
+                ENDIF
+ 0000           DAC_P05_OFF:              equ 00h
+ 0001           DAC_P05_LOWPOWER:         equ 01h
+ 0002           DAC_P05_MEDPOWER:         equ 02h
+ 0003           DAC_P05_HIGHPOWER:        equ 03h
+ 039A           
+ 0094           DAC_P05_CR0:              equ 94h
+ 0095           DAC_P05_CR1:              equ 95h
+ 0096           DAC_P05_CR2:              equ 96h
+ 0097           DAC_P05_CR3:              equ 97h
+ 039A           
+ 0004           DAC_P05_OffsetBinary:     equ 04h
+ 0002           DAC_P05_TwosComplement:   equ 02h
+ 0001           DAC_P05_SignAndMagnitude: equ 01h
+ 0000           DAC_P05_RawRegister:      equ 00h
+ 039A           
+ 0007           DAC_P05_DATAFORMAT:       equ 7h
+ 0004           DAC_P05_OFFSETBINARY:     equ DAC_P05_DATAFORMAT & DAC_P05_OffsetBinary
+ 0002           DAC_P05_TWOSCOMPLEMENT:   equ DAC_P05_DATAFORMAT & DAC_P05_TwosComplement
+ 0001           DAC_P05_SIGNANDMAGNITUDE: equ DAC_P05_DATAFORMAT & DAC_P05_SignAndMagnitude
+ 039A           
+ 0000           DAC_P05_PHASE_Normal:     equ 0
+ 0001           DAC_P05_PHASE_Swapped:    equ 1
+ 0000           DAC_P05_PHASE_SWAP:       equ DAC_P05_PHASE_Normal
+ 039A           
+                IF DAC_P05_PHASE_SWAP
+                    DAC_P05_CR0_HIBITS:   equ C0h
+                ELSE
+ 0080               DAC_P05_CR0_HIBITS:   equ 80h
+                ENDIF
+                
+                ;
+                ;Control signal routing for DAC outputs
+                ;
+ 039A           InitDAC:
+ 039A 550300                    mov             [ABF_TMP],#0                    ;turn off all outputs, reset latch
+ 039D 08                        push    a
+ 039E 5103                      mov             a,[ABF_TMP]
+ 03A0 7110          or    F, FlagXIOMask
+ 03A2 6062                      mov             reg[ABF_CR],a
+ 03A4 70EF          and   F, ~FlagXIOMask
+ 03A6 18                        pop             a
+ 03A7                           
+ 03A7 903C                      call    DAC_P03_Off
+ 03A9 9084                      call    DAC_P05_Off
+ 03AB 90CC                      call    DAC_P04_Off
+ 03AD 9114                      call    DAC_P02_Off
+ 03AF 7F                        ret
+ 03B0           
+ 03B0           ;
+ 03B0           ;Turn off DAC indicated by bit in A
+ 03B0           ;               
+ 03B0           DisableDAC:
+ 03B0 1102                      sub             a,#2
+ 03B2 70FB                      and             F,#~4
+ 03B4 6A                        rlc             a
+ 03B5 E001                      jacc    DisableLUT
+ 03B7                           
+ 03B7           DisableLUT:
+ 03B7 810B                      jmp             DAC_P02_Off
+ 03B9 802B                      jmp             DAC_P03_Off
+ 03BB 80BD                      jmp             DAC_P04_Off
+ 03BD 8071                      jmp             DAC_P05_Off
+ 03BF                           
+ 03BF           DAC_P03_On:
+ 03BF 7110          or    F, FlagXIOMask
+ 03C1 2E0708                    or              [PRTDM1_T+0],8                          ;high-Z mode for P0[3]
+ 03C4 2604F7                    and             [PRTDM0_T+0],~8
+ 03C7 08                        push    a
+ 03C8 5104                      mov             a,[PRTDM0_T+0]
+ 03CA 6000                      mov             reg[PRT0DM0],a
+ 03CC 5107                      mov             a,[PRTDM1_T+0]
+ 03CE 6001                      mov             reg[PRT0DM1],a
+ 03D0 18                        pop             a
+ 03D1 70EF          and   F, ~FlagXIOMask
+ 03D3 5002                      mov             a,#DAC_P03_MEDPOWER
+ 03D5 9000                      call    DAC_P03_Start
+ 03D7           
+ 03D7 2E0308                    or              [ABF_TMP],#8
+ 03DA 08                        push    a
+ 03DB 5103                      mov             a,[ABF_TMP]
+ 03DD 7110          or    F, FlagXIOMask
+ 03DF 6062                      mov             reg[ABF_CR],a
+ 03E1 70EF          and   F, ~FlagXIOMask
+ 03E3 18                        pop             a
+ 03E4 7F                        ret
+ 03E5                           
+ 03E5           DAC_P03_Off:
+ 03E5 7110          or    F, FlagXIOMask
+ 03E7 2607F7                    and             [PRTDM1_T+0],~8                         ;pulldown mode for P0[3]
+ 03EA 2604F7                    and             [PRTDM0_T+0],~8
+ 03ED 08                        push    a
+ 03EE 5104                      mov             a,[PRTDM0_T+0]
+ 03F0 6000                      mov             reg[PRT0DM0],a
+ 03F2 5107                      mov             a,[PRTDM1_T+0]
+ 03F4 6001                      mov             reg[PRT0DM1],a
+ 03F6 18                        pop             a
+ 03F7 70EF          and   F, ~FlagXIOMask
+ 03F9 2603F7                    and             [ABF_TMP],#~8
+ 03FC 08                        push    a
+ 03FD 5103                      mov             a,[ABF_TMP]
+ 03FF 7110          or    F, FlagXIOMask
+ 0401 6062                      mov             reg[ABF_CR],a
+ 0403 70EF          and   F, ~FlagXIOMask
+ 0405 18                        pop             a
+ 0406           
+ 0406 9000                      call    DAC_P03_Stop
+ 0408 7F                        ret
+ 0409                           
+ 0409           DAC_P05_On:
+ 0409 7110          or    F, FlagXIOMask
+ 040B 2E0720                    or              [PRTDM1_T+0],20h                        ;high-Z mode for P0[5]
+ 040E 2604DF                    and             [PRTDM0_T+0],~20h
+ 0411 08                        push    a
+ 0412 5104                      mov             a,[PRTDM0_T+0]
+ 0414 6000                      mov             reg[PRT0DM0],a
+ 0416 5107                      mov             a,[PRTDM1_T+0]
+ 0418 6001                      mov             reg[PRT0DM1],a
+ 041A 18                        pop             a
+ 041B 70EF          and   F, ~FlagXIOMask
+ 041D 5002                      mov             a,#DAC_P05_MEDPOWER
+ 041F 9000                      call    DAC_P05_Start
+ 0421           
+ 0421 2E0320                    or              [ABF_TMP],#20h
+ 0424 08                        push    a
+ 0425 5103                      mov             a,[ABF_TMP]
+ 0427 7110          or    F, FlagXIOMask
+ 0429 6062                      mov             reg[ABF_CR],a
+ 042B 70EF          and   F, ~FlagXIOMask
+ 042D 18                        pop             a
+ 042E 7F                        ret
+ 042F                           
+ 042F           DAC_P05_Off:
+ 042F 7110          or    F, FlagXIOMask
+ 0431 2607DF                    and             [PRTDM1_T+0],~20h                       ;pulldown mode for P0[5]
+ 0434 2604DF                    and             [PRTDM0_T+0],~20h
+ 0437 08                        push    a
+ 0438 5104                      mov             a,[PRTDM0_T+0]
+ 043A 6000                      mov             reg[PRT0DM0],a
+ 043C 5107                      mov             a,[PRTDM1_T+0]
+ 043E 6001                      mov             reg[PRT0DM1],a
+ 0440 18                        pop             a
+ 0441 70EF          and   F, ~FlagXIOMask
+ 0443 2603DF                    and             [ABF_TMP],#~20h
+ 0446 08                        push    a
+ 0447 5103                      mov             a,[ABF_TMP]
+ 0449 7110          or    F, FlagXIOMask
+ 044B 6062                      mov             reg[ABF_CR],a
+ 044D 70EF          and   F, ~FlagXIOMask
+ 044F 18                        pop             a
+ 0450           
+ 0450 9000                      call    DAC_P05_Stop
+ 0452 7F                        ret
+ 0453                           
+ 0453           DAC_P04_On:
+ 0453 7110          or    F, FlagXIOMask
+ 0455 2E0710                    or              [PRTDM1_T+0],10h                        ;high-Z mode for P0[4]
+ 0458 2604EF                    and             [PRTDM0_T+0],~10h
+ 045B 08                        push    a
+ 045C 5104                      mov             a,[PRTDM0_T+0]
+ 045E 6000                      mov             reg[PRT0DM0],a
+ 0460 5107                      mov             a,[PRTDM1_T+0]
+ 0462 6001                      mov             reg[PRT0DM1],a
+ 0464 18                        pop             a
+ 0465 70EF          and   F, ~FlagXIOMask
+ 0467 5002                      mov             a,#DAC_P04_MEDPOWER
+ 0469 9000                      call    DAC_P04_Start
+ 046B           
+ 046B 2E0310                    or              [ABF_TMP],#10h
+ 046E 08                        push    a
+ 046F 5103                      mov             a,[ABF_TMP]
+ 0471 7110          or    F, FlagXIOMask
+ 0473 6062                      mov             reg[ABF_CR],a
+ 0475 70EF          and   F, ~FlagXIOMask
+ 0477 18                        pop             a
+ 0478 7F                        ret
+ 0479                           
+ 0479           DAC_P04_Off:
+ 0479 7110          or    F, FlagXIOMask
+ 047B 2607EF                    and             [PRTDM1_T+0],~10h                       ;pulldown mode for P0[4]
+ 047E 2604EF                    and             [PRTDM0_T+0],~10h
+ 0481 08                        push    a
+ 0482 5104                      mov             a,[PRTDM0_T+0]
+ 0484 6000                      mov             reg[PRT0DM0],a
+ 0486 5107                      mov             a,[PRTDM1_T+0]
+ 0488 6001                      mov             reg[PRT0DM1],a
+ 048A 18                        pop             a
+ 048B 70EF          and   F, ~FlagXIOMask
+ 048D 2603EF                    and             [ABF_TMP],#~10h
+ 0490 08                        push    a
+ 0491 5103                      mov             a,[ABF_TMP]
+ 0493 7110          or    F, FlagXIOMask
+ 0495 6062                      mov             reg[ABF_CR],a
+ 0497 70EF          and   F, ~FlagXIOMask
+ 0499 18                        pop             a
+ 049A           
+ 049A 9000                      call    DAC_P04_Stop
+ 049C 7F                        ret
+ 049D                           
+ 049D           DAC_P02_On:
+ 049D 7110          or    F, FlagXIOMask
+ 049F 2E0704                    or              [PRTDM1_T+0],4                          ;high-Z mode for P0[2]
+ 04A2 2604FB                    and             [PRTDM0_T+0],~4
+ 04A5 08                        push    a
+ 04A6 5104                      mov             a,[PRTDM0_T+0]
+ 04A8 6000                      mov             reg[PRT0DM0],a
+ 04AA 5107                      mov             a,[PRTDM1_T+0]
+ 04AC 6001                      mov             reg[PRT0DM1],a
+ 04AE 18                        pop             a
+ 04AF 70EF          and   F, ~FlagXIOMask
+ 04B1 5002                      mov             a,#DAC_P02_MEDPOWER
+ 04B3 9000                      call    DAC_P02_Start
+ 04B5           
+ 04B5 2E0304                    or              [ABF_TMP],#4
+ 04B8 08                        push    a
+ 04B9 5103                      mov             a,[ABF_TMP]
+ 04BB 7110          or    F, FlagXIOMask
+ 04BD 6062                      mov             reg[ABF_CR],a
+ 04BF 70EF          and   F, ~FlagXIOMask
+ 04C1 18                        pop             a
+ 04C2 7F                        ret
+ 04C3                           
+ 04C3           DAC_P02_Off:
+ 04C3 7110          or    F, FlagXIOMask
+ 04C5 2607FB                    and             [PRTDM1_T+0],~4                         ;pulldown mode for P0[2]
+ 04C8 2604FB                    and             [PRTDM0_T+0],~4
+ 04CB 08                        push    a
+ 04CC 5104                      mov             a,[PRTDM0_T+0]
+ 04CE 6000                      mov             reg[PRT0DM0],a
+ 04D0 5107                      mov             a,[PRTDM1_T+0]
+ 04D2 6001                      mov             reg[PRT0DM1],a
+ 04D4 18                        pop             a
+ 04D5 70EF          and   F, ~FlagXIOMask
+ 04D7 2603FB                    and             [ABF_TMP],#~4
+ 04DA 08                        push    a
+ 04DB 5103                      mov             a,[ABF_TMP]
+ 04DD 7110          or    F, FlagXIOMask
+ 04DF 6062                      mov             reg[ABF_CR],a
+ 04E1 70EF          and   F, ~FlagXIOMask
+ 04E3 18                        pop             a
+ 04E4           
+ 04E4 9000                      call    DAC_P02_Stop
+ 04E6 7F                        ret
+ 04E7                           
+ 04E7           _main:
+ 04E7           
+ 04E7           		
+ 04E7 9012                      call    InitComms
+ 04E9 9EAF                      call    InitDAC
+ 04EB 9D1D                      call    InitADC
+ 04ED                                                           
+ 04ED 7101          or    F, FlagGlobalIE
+ 04EF           
+ 04EF 92D0                      call    SettleDelay
+ 04F1 90C9                      call    Signon
+ 04F3                                           
+ 04F3           main_loop:	
+ 04F3 90DB                      call    GetLine                 ;Get command line
+ 04F5 AFFD                      jz              main_loop               ;Skip length=0
+ 04F7 90FB                      call    ProcessCmd              ;Process command line
+ 04F9 8FF9                      jmp             main_loop               ;Loop 4 ever
+ 04FB           
+ 04FB           
+ 04FB           ;
+ 04FB           ;Communications section
+ 04FB           ;
+ 0004           bBAUDCLK_INT_MASK:         equ 04h  
+ 04FB           ;counter8 interrupt address
+ 00E1           BAUDCLK_INT_REG:           equ 0e1h  
+ 04FB           
+ 04FB           
+ 04FB           ;---------------------------------
+ 04FB           ;  Registers used by counter8
+ 04FB           ;---------------------------------
+ 002B           BAUDCLK_CONTROL_REG:    equ 2bh                  ;Control register
+ 0028           BAUDCLK_COUNTER_REG:    equ 28h                  ;Counter register
+ 0029           BAUDCLK_PERIOD_REG: equ 29h                      ;Period value register
+ 002A           BAUDCLK_COMPARE_REG:    equ 2ah                  ;CompareValue register
+ 0028           BAUDCLK_FUNC_REG:   equ 28h                      ;Function register
+ 0029           BAUDCLK_INPUT_REG:  equ 29h                      ;Input register
+ 002A           BAUDCLK_OUTPUT_REG: equ 2ah                      ;Output register
+ 04FB           
+ 04FB           ; end of file
+ 0080           bUARTIN_TX_INT_MASK:        equ 80h  
+ 04FB           ;TX interrupt address
+ 00E1           UARTIN_TX_INT_REG:          equ 0e1h  
+ 04FB           ;mask value for global int reg bit for RX instance
+ 0040           bUARTIN_RX_INT_MASK:        equ 40h  
+ 04FB           ;RX interrupt address
+ 00E1           UARTIN_RX_INT_REG:          equ 0e1h  
+ 04FB                
+ 04FB           ;------------------------------------
+ 04FB           ;  Parity masks
+ 04FB           ;------------------------------------
+ 0000           UART_PARITY_NONE:       equ   00h
+ 0002           UART_PARITY_EVEN:       equ   02h
+ 0006           UART_PARITY_ODD:        equ   06h
+ 04FB                                         
+ 04FB           ;------------------------------------
+ 04FB           ;  TX Status Register masks
+ 04FB           ;------------------------------------
+ 0020           UART_TX_COMPLETE:       equ   20h
+ 0010           UART_TX_BUFFER_EMPTY:   equ   10h
+ 04FB           
+ 04FB           ;------------------------------------
+ 04FB           ;  RX Status Register masks
+ 04FB           ;------------------------------------
+ 0010           UART_RX_ACTIVE:         equ   10h
+ 0008           UART_RX_COMPLETE:       equ   08h
+ 0080           UART_RX_PARITY_ERROR:   equ   80h
+ 0040           UART_RX_OVERRUN_ERROR:  equ   40h
+ 0020           UART_RX_FRAMING_ERROR:  equ   20h
+ 00E0           UART_RX_NO_ERROR:       equ   E0h
+ 04FB           
+ 04FB           
+ 04FB           ;---------------------------------
+ 04FB           ;  Registers used by TX
+ 04FB           ;---------------------------------
+ 003F           UARTIN_TX_CONTROL_REG:  equ 3fh                  ;Control register
+ 003C           UARTIN_TX_SHIFT_REG:    equ 3ch                  ;TX Shift Register register
+ 003D           UARTIN_TX_BUFFER_REG:   equ 3dh                  ;TX Buffer Register
+ 003C           UARTIN_TX_FUNC_REG: equ 3ch                      ;Function register
+ 003D           UARTIN_TX_INPUT_REG:    equ 3dh                  ;Input register
+ 003E           UARTIN_TX_OUTPUT_REG:   equ 3eh                  ;Output register
+ 04FB           
+ 04FB           ;---------------------------------
+ 04FB           ;  Registers used by RX
+ 04FB           ;---------------------------------
+ 003B           UARTIN_RX_CONTROL_REG:  equ 3bh                  ;Control register
+ 0038           UARTIN_RX_SHIFT_REG:    equ 38h                  ;RX Shift Register register
+ 003A           UARTIN_RX_BUFFER_REG:   equ 3ah                  ;RX Buffer Register
+ 0038           UARTIN_RX_FUNC_REG: equ 38h                      ;Function register
+ 0039           UARTIN_RX_INPUT_REG:    equ 39h                  ;Input register
+ 003A           UARTIN_RX_OUTPUT_REG:   equ 3ah                  ;Output register
+ 04FB           
+ 04FB           ; end of file
+ 0010           bUARTOUT_TX_INT_MASK:        equ 10h  
+ 04FB           ;TX interrupt address
+ 00E1           UARTOUT_TX_INT_REG:          equ 0e1h  
+ 04FB           ;mask value for global int reg bit for RX instance
+ 0020           bUARTOUT_RX_INT_MASK:        equ 20h  
+ 04FB           ;RX interrupt address
+ 00E1           UARTOUT_RX_INT_REG:          equ 0e1h  
+ 04FB                
+ 04FB           ;------------------------------------
+ 04FB           ;  Parity masks
+ 04FB           ;------------------------------------
+ 0000           UART_PARITY_NONE:       equ   00h
+ 0002           UART_PARITY_EVEN:       equ   02h
+ 0006           UART_PARITY_ODD:        equ   06h
+ 04FB                                         
+ 04FB           ;------------------------------------
+ 04FB           ;  TX Status Register masks
+ 04FB           ;------------------------------------
+ 0020           UART_TX_COMPLETE:       equ   20h
+ 0010           UART_TX_BUFFER_EMPTY:   equ   10h
+ 04FB           
+ 04FB           ;------------------------------------
+ 04FB           ;  RX Status Register masks
+ 04FB           ;------------------------------------
+ 0010           UART_RX_ACTIVE:         equ   10h
+ 0008           UART_RX_COMPLETE:       equ   08h
+ 0080           UART_RX_PARITY_ERROR:   equ   80h
+ 0040           UART_RX_OVERRUN_ERROR:  equ   40h
+ 0020           UART_RX_FRAMING_ERROR:  equ   20h
+ 00E0           UART_RX_NO_ERROR:       equ   E0h
+ 04FB           
+ 04FB           
+ 04FB           ;---------------------------------
+ 04FB           ;  Registers used by TX
+ 04FB           ;---------------------------------
+ 0033           UARTOUT_TX_CONTROL_REG: equ 33h                  ;Control register
+ 0030           UARTOUT_TX_SHIFT_REG:   equ 30h                  ;TX Shift Register register
+ 0031           UARTOUT_TX_BUFFER_REG:  equ 31h                  ;TX Buffer Register
+ 0030           UARTOUT_TX_FUNC_REG:    equ 30h                  ;Function register
+ 0031           UARTOUT_TX_INPUT_REG:   equ 31h                  ;Input register
+ 0032           UARTOUT_TX_OUTPUT_REG:  equ 32h                  ;Output register
+ 04FB           
+ 04FB           ;---------------------------------
+ 04FB           ;  Registers used by RX
+ 04FB           ;---------------------------------
+ 0037           UARTOUT_RX_CONTROL_REG: equ 37h                  ;Control register
+ 0034           UARTOUT_RX_SHIFT_REG:   equ 34h                  ;RX Shift Register register
+ 0036           UARTOUT_RX_BUFFER_REG:  equ 36h                  ;RX Buffer Register
+ 0034           UARTOUT_RX_FUNC_REG:    equ 34h                  ;Function register
+ 0035           UARTOUT_RX_INPUT_REG:   equ 35h                  ;Input register
+ 0036           UARTOUT_RX_OUTPUT_REG:  equ 36h                  ;Output register
+ 04FB           
+ 04FB           ; end of file
+ 04FB           
+ 04FB           ;
+ 04FB           ;Initialise both UARTs
+ 04FB           ;
+ 04FB           InitComms:
+ 04FB           
+ 04FB 550400                    mov             [PRTDM0_T+0],#0
+ 04FE 550700                    mov             [PRTDM1_T+0],#0                 
+ 0501 550500                    mov             [PRTDM0_T+1],#0
+ 0504 550800                    mov             [PRTDM1_T+1],#0                 
+ 0507 550600                    mov             [PRTDM0_T+2],#0
+ 050A 550900                    mov             [PRTDM1_T+2],#0                 ;initialise latch storage registers
+ 050D           
+ 050D 2E05A0                    or              [PRTDM0_T+1],#128+32    ;P1[7],P1[5]=Strong out (TX)
+ 0510 2E0850                    or              [PRTDM1_T+1],#64+16     ;P1[6],P1[4]=High Z     (RX)
+ 0513                           
+ 0513 7110          or    F, FlagXIOMask
+ 0515 08                        push    a
+ 0516 5104                      mov             a,[PRTDM0_T+0]
+ 0518 6000                      mov             reg[PRT0DM0],a
+ 051A 5107                      mov             a,[PRTDM1_T+0]
+ 051C 6001                      mov             reg[PRT0DM1],a
+ 051E 18                        pop             a
+ 051F 08                        push    a
+ 0520 5105                      mov             a,[PRTDM0_T+1]
+ 0522 6004                      mov             reg[PRT1DM0],a
+ 0524 5108                      mov             a,[PRTDM1_T+1]
+ 0526 6005                      mov             reg[PRT1DM1],a
+ 0528 18                        pop             a
+ 0529 08                        push    a
+ 052A 5106                      mov             a,[PRTDM0_T+2]
+ 052C 6008                      mov             reg[PRT2DM0],a
+ 052E 5109                      mov             a,[PRTDM1_T+2]
+ 0530 6009                      mov             reg[PRT2DM1],a
+ 0532 18                        pop             a
+ 0533 70EF          and   F, ~FlagXIOMask
+ 0535           
+ 0535 5000                      mov             a,#UART_PARITY_NONE
+ 0537 9000                      call    UARTIN_Start
+ 0539 5000                      mov             a,#UART_PARITY_NONE
+ 053B 9000                      call    UARTOUT_Start
+ 053D 9000                      call    BAUDCLK_Start
+ 053F 7F                        ret
+ 0540           
+ 0540           ;
+ 0540           ;Transmit A upstream 
+ 0540           ;
+ 0540           TxIN:
+ 0540 493F10                    tst             reg[UARTIN_TX_CONTROL_REG],UART_TX_BUFFER_EMPTY
+ 0543 AFFC                      jz              TxIN
+ 0545 9000                      call    UARTIN_SendData
+ 0547 7F                        ret     
+ 0548           
+ 0548           ;
+ 0548           ;Transmit a newline upstream
+ 0548           ;
+ 0548           NewLine:
+ 0548 500A                      mov             a,#10
+ 054A 9FF4                      call    TxIN
+ 054C 500D                      mov             a,#13
+ 054E 8FF1                      jmp             TxIN
+ 0550           
+ 0550           ;
+ 0550           ;Transmit a 16-bit hex digit upstream
+ 0550           ;
+ 0550           ;X:A=Value
+ 0550           ;               
+ 0550           DumpHex16:
+ 0550 08                        push    a
+ 0551 4B                        swap    a,x
+ 0552 9003                      call    DumpHex
+ 0554 18                        pop             a
+ 0555 8001                      jmp             DumpHex
+ 0557                           
+ 0557           
+ 0557           ;
+ 0557           ;Transmit a 8-bit hex digit upstream
+ 0557           ;
+ 0557           ;A=Value
+ 0557           ;               
+ 0557           DumpHex:
+ 0557 5301                      mov             [TMP2],a
+ 0559 6D                        rrc             a
+ 055A 6D                        rrc             a
+ 055B 6D                        rrc             a
+ 055C 6D                        rrc             a
+ 055D 210F                      and             a,#15
+ 055F F00A                      index   HEXLUT
+ 0561 9FDD                      call    TxIN
+ 0563 5101                      mov             a,[TMP2]
+ 0565 210F                      and             a,#15
+ 0567 F002                      index   HEXLUT
+ 0569 8FD6                      jmp             TxIN
+ 056B           
+ 056B           ;
+ 056B           ;Hex digit codes
+ 056B           ;
+ 056B           HEXLUT:
+ 056B 30313233343536373839414243444546          ds              "0123456789ABCDEF"
+ 057B                           
+ 057B           ;
+ 057B           ;Dump null terminated string pointed to by A:X
+ 057B           ;
+ 057B           DumpString:
+ 057B 5300                      mov             [TMP],a
+ 057D 28                        romx
+ 057E A00B                      jz              DumpDone
+ 0580 9FBE                      call    TxIN
+ 0582 5100                      mov             a,[TMP]
+ 0584 75                        inc             x
+ 0585 BFF5                      jnz         DumpString
+ 0587 74                        inc             a
+ 0588 BFF2                      jnz             DumpString
+ 058A           DumpDone:
+ 058A 7F                        ret
+ 058B                                   
+ 058B           ;
+ 058B           ;Transmit A downstream 
+ 058B           ;
+ 058B           TxOUT:
+ 058B 493310                    tst             reg[UARTOUT_TX_CONTROL_REG],UART_TX_BUFFER_EMPTY
+ 058E AFFC                      jz              TxOUT
+ 0590 9000                      call    UARTOUT_SendData
+ 0592 7F                        ret     
+ 0593           ;
+ 0593           ;Receive A from upstream controller (blocking)
+ 0593           ;If a byte is received from downstream controller, 
+ 0593           ;       echo it to upstream controller for daisy chaining
+ 0593           ;
+ 0593           RxIN:
+ 0593 9000                      call    bUARTOUT_ReadRxStatus
+ 0595 5312                      mov             [RX_STATUS],a
+ 0597 2108                      and             a,#UART_RX_COMPLETE
+ 0599 A00E                      jz              NoRxOUT
+ 059B 4712E0                    tst             [RX_STATUS],#UART_RX_NO_ERROR
+ 059E B009                      jnz             NoRxOUT
+ 05A0 9000                      call    bUARTOUT_ReadRxData                     ;fetch data
+ 05A2 3900                      cmp             a,#0
+ 05A4 A003                      jz              NoRxOUT                                         ;screen nulls
+ 05A6 9F98                      call    TxIN                                            ;pass it up
+ 05A8           NoRxOUT:
+ 05A8 9000                      call    bUARTIN_ReadRxStatus
+ 05AA 5312                      mov             [RX_STATUS],a
+ 05AC 2108                      and             a,#UART_RX_COMPLETE
+ 05AE AFE4                      jz              RxIN
+ 05B0 4712E0                    tst             [RX_STATUS],#UART_RX_NO_ERROR
+ 05B3 BFDF                      jnz             RxIN
+ 05B5 9000                      call    bUARTIN_ReadRxData
+ 05B7 3900                      cmp             a,#0
+ 05B9 AFD9                      jz              RxIN                                            ;screen nulls
+ 05BB 7F                        ret
+ 05BC           
+ 05BC           ;
+ 05BC           ;Print the signon message
+ 05BC           ;       
+ 05BC           Signon:
+ 05BC 50C5                      mov             a,#>Signon_MSG
+ 05BE 57C5                      mov             x,#<Signon_MSG
+ 05C0 9FB9                      call    DumpString
+ 05C2 9F84                      call    NewLine
+ 05C4 7F                        ret
+ 05C5           
+ 05C5           Signon_MSG:
+ 05C5 506F64204F6E6C696E6500            asciz           "Pod Online"
+ 05D0           
+ 05D0           ;
+ 05D0           ;Get a LF terminated line from the upstream controller
+ 05D0           ;Strip LF,CR and NULL terminate it
+ 05D0           ;
+ 05D0           ;Returns string length in A (not including NULL)
+ 05D0           ;
+ 000A           LF:		equ		10
+ 000D           CR:		equ		13
+ 05D0           
+ 05D0           GetLine:
+ 05D0           
+ 05D0 550213                    mov             [TMP3],#COMMBUF                 ;set up storage pointer
+ 05D3           GetSyncLoop:
+ 05D3 9FBE                      call    RxIN                                    ;get a char (blocking)
+ 05D5 3921                      cmp             a,#'!'                                  ;scan for start character
+ 05D7 BFFB                      jnz             GetSyncLoop                             ;ignore everything 
+ 05D9           GetCmdLoop:
+ 05D9 9FB8                      call    RxIN                                    ;get a char (blocking)
+ 05DB 390D                      cmp             a,#CR                                   ;terminate character?
+ 05DD A00C                      jz              GetDone
+ 05DF 391F                      cmp             a,#31                                   ;disregard control chars
+ 05E1 CFF7                      jc              GetCmdLoop
+ 05E3 3F02                      mvi             [TMP3],a                                ;store char, advance ptr
+ 05E5 3C0222                    cmp             [TMP3],COMMBUF+MAXLINE-1        ;out of storage space?
+ 05E8 BFF0                      jnz             GetCmdLoop                              ;no, next char
+ 05EA           GetDone:
+ 05EA 5000                      mov             a,#0
+ 05EC 3F02                      mvi             [TMP3],a                                ;null terminate string
+ 05EE 160214                    sub             [TMP3],#COMMBUF+1               ;work out length
+ 05F1 5102                      mov             a,[TMP3]
+ 05F3 7F                        ret                                     
+ 05F4           
+ 05F4           ;
+ 05F4           ;Process a command
+ 05F4           ;
+ 05F4           ProcessCmd:
+ 05F4 550213                    mov             [TMP3],#COMMBUF                 ;initialise pointer
+ 05F7                           
+ 05F7 3E02                      mvi             a,[TMP3]                                ;fetch address byte
+ 05F9 A01F                      jz              ProcessDone                             ;unexepected NULL
+ 05FB                           
+ 05FB 3930                      cmp             a,#'0'                                  ;command for this pod?
+ 05FD A01C                      jz              ProcessMatch                    ;yes, interpret command
+ 05FF                                           
+ 05FF           ProcessEcho:
+ 05FF C019                      jc              ProcessDone                             ;invalid address - discard
+ 0601                           
+ 0601 78                        dec             a                                               ;consume one hop 
+ 0602 08                        push    a
+ 0603 5021                      mov             a,#'!'                                  ;command header
+ 0605 9F84                      call    TxOUT
+ 0607 18                        pop             a
+ 0608 9F81                      call    TxOUT                                   ;address
+ 060A           EchoLoop:
+ 060A 3E02                      mvi             a,[TMP3]                                ;echo command downstream
+ 060C A008                      jz              EchoDone
+ 060E 9F7B                      call    TxOUT
+ 0610 3C0223                    cmp             [TMP3],#COMMBUF+MAXLINE
+ 0613 BFF6                      jnz             EchoLoop
+ 0615           EchoDone:
+ 0615 500D                      mov             a,#CR
+ 0617 9F72                      call    TxOUT                                   ;terminate
+ 0619           ProcessDone:
+ 0619 7F                        ret
+ 061A           
+ 061A           ;
+ 061A           ;Command destination is this unit - 
+ 061A           ;process command and generate appropriate response 
+ 061A           ;
+ 061A           ProcessMatch:
+ 061A           
+ 061A 3E02                      mvi             a,[TMP3]                ;Fetch command
+ 061C AFFC                      jz              ProcessDone             ;Unexpected NULL - discard
+ 061E 3957                      cmp             a,#'W'                  ;Write DAC
+ 0620 A124                      jz              ProcessAnaOut
+ 0622 393D                      cmp             a,#'='                  ;Write digital output
+ 0624 A0C5                      jz              ProcessDigOut
+ 0626 393F                      cmp             a,#'?'
+ 0628 A07A                      jz              ProcessDigIn    ;Read digital input
+ 062A 3952                      cmp             a,#'R'
+ 062C BFEC                      jnz             ProcessDone             ;Unsupported command - discard
+ 062E           
+ 062E           ;
+ 062E           ;Read analog input command
+ 062E           ;
+ 062E           ;Command syntax !0R+-GGNNDD     
+ 062E           ;
+ 062E           ;+              Positive Input Port 0 (0..7). Note that 8 is the ground.
+ 062E           ;-              Negative Input Port 0 (0..7)
+ 062E           ;GG             Gain constant
+ 062E           ;NN             Number of samples
+ 062E           ;DD             Sampling frequency
+ 062E           ;
+ 062E           ProcessAnaIn:
+ 062E 9177                      call    GetHexDigit                             ;Scan + input
+ 0630 C10F                      jc              CmdError
+ 0632 3909                      cmp             a,#9
+ 0634 D10B                      jnc             CmdError
+ 0636 530A                      mov             [PORT],a
+ 0638 916D                      call    GetHexDigit                             ;Scan - input
+ 063A C105                      jc              CmdError
+ 063C 3909                      cmp             a,#9
+ 063E D101                      jnc             CmdError
+ 0640 530B                      mov             [PORT+1],a
+ 0642           
+ 0642 9150                      call    GetHexByte
+ 0644 C0FB                      jc              CmdError
+ 0646 530D                      mov             [GAINK],a
+ 0648 914A                      call    GetHexByte
+ 064A C0F5                      jc              CmdError
+ 064C 530C                      mov             [NOSAMPLES],a           
+ 064E 9144                      call    GetHexByte
+ 0650 C0EF                      jc              CmdError
+ 0652 5311                      mov             [SAMPLECLK],a
+ 0654           
+ 0654 3C0B08                    cmp             [PORT+1],#8                     ;Single ended +VE input
+ 0657 A021                      jz              Single
+ 0659 3C0A08                    cmp             [PORT],#8                       ;Single ended -VE input
+ 065C A031                      jz              SingleInverted
+ 065E           Double:
+ 065E 510A                      mov             a,[PORT]
+ 0660 6A                        rlc             a
+ 0661 6A                        rlc             a
+ 0662 6A                        rlc             a
+ 0663 6A                        rlc             a
+ 0664 21F0                      and             a,#240
+ 0666 2A0B                      or              a,[PORT+1]
+ 0668 9AC2                      call    DoubleEndedPort
+ 066A C0D5                      jc              CmdError                        ;Not possible?
+ 066C 502A                      mov             a,#'*'
+ 066E 9ED0                      call    TxIN
+ 0670 9BAC                      call    RunADC
+ 0672 C0CD                      jc              CmdError
+ 0674 9EDA                      call    DumpHex16
+ 0676 9ED0                      call    NewLine                         
+ 0678 7F                        ret
+ 0679           
+ 0679           Single:
+ 0679 510A                      mov             a,[PORT]
+ 067B 3908                      cmp             a,#8
+ 067D A0C2                      jz              CmdError
+ 067F 998F                      call    SingleEndedPort
+ 0681 502A                      mov             a,#'*'
+ 0683 9EBB                      call    TxIN
+ 0685 9B97                      call    RunADC
+ 0687 C0B8                      jc              CmdError
+ 0689 9EC5                      call    DumpHex16
+ 068B 9EBB                      call    NewLine
+ 068D 7F                        ret
+ 068E           
+ 068E           SingleInverted:
+ 068E 510B                      mov             a,[PORT+1]
+ 0690 3908                      cmp             a,#8
+ 0692 A0AD                      jz              CmdError
+ 0694 9A03                      call    SingleEndedInvPort
+ 0696 502A                      mov             a,#'*'
+ 0698 9EA6                      call    TxIN
+ 069A 9B82                      call    RunADC
+ 069C C0A3                      jc              CmdError
+ 069E 9EB0                      call    DumpHex16
+ 06A0 9EA6                      call    NewLine
+ 06A2 7F                        ret
+ 06A3           
+ 06A3           ;
+ 06A3           ;Read digital input command
+ 06A3           ;                                                               
+ 06A3           ;
+ 06A3           ;Command syntax !0?PBM          P=Port 0..1 B=Bit 0..7 M=Set DDR (1=Yes 0=No)
+ 06A3           ;
+ 06A3           ProcessDigIn:
+ 06A3           
+ 06A3 9026                      call    GetPortBit                      ;Scan port & bit settings
+ 06A5 C09A                      jc              CmdError
+ 06A7                           
+ 06A7 90FE                      call    GetHexDigit                     ;Scan mode setting
+ 06A9 C096                      jc              CmdError
+ 06AB 3900                      cmp             a,#0                            ;Don't force DDR?
+ 06AD A005                      jz              SkipDDR                         ;Yes, skip it
+ 06AF 510A                      mov             a,[PORT]
+ 06B1 9C8B                      call    SetDDRIn
+ 06B3           SkipDDR:
+ 06B3 502A                      mov             a,#'*'
+ 06B5 9E89                      call    TxIN
+ 06B7 510A                      mov             a,[PORT]
+ 06B9 9CD2                      call    ReadDigitalInput
+ 06BB B008                      jnz             DigIsHigh
+ 06BD           DigIsLow:
+ 06BD 5030                      mov             a,#'0'
+ 06BF 9E7F                      call    TxIN
+ 06C1 9E85                      call    NewLine
+ 06C3 7F                        ret
+ 06C4           DigIsHigh:
+ 06C4 5031                      mov             a,#'1'
+ 06C6 9E78                      call    TxIN
+ 06C8 9E7E                      call    NewLine
+ 06CA 7F                        ret
+ 06CB           
+ 06CB           ;
+ 06CB           ;Interpret the port/bit combination
+ 06CB           ;
+ 06CB           GetPortBit:
+ 06CB           
+ 06CB 90DA                      call    GetHexDigit
+ 06CD C019                      jc              PortBitErr
+ 06CF 3902                      cmp             a,#2                    ;Port 0 or 1
+ 06D1 D015                      jnc             PortBitErr
+ 06D3 6A                        rlc             a
+ 06D4 6A                        rlc             a
+ 06D5 6A                        rlc             a
+ 06D6 2108                      and             a,#8                    ;Shift up
+ 06D8 530A                      mov             [PORT],a                ;Save
+ 06DA 90CB                      call    GetHexDigit
+ 06DC C00A                      jc              PortBitErr
+ 06DE 3908                      cmp             a,#8
+ 06E0 D006                      jnc             PortBitErr              ;Bit 0..7
+ 06E2 2C0A                      or              [PORT],a
+ 06E4 70FB                      and             F,#~4
+ 06E6 7F                        ret
+ 06E7           PortBitErr:
+ 06E7 7104                      or              F,#4
+ 06E9 7F                        ret
+ 06EA           
+ 06EA           ;
+ 06EA           ;Drive digital output command
+ 06EA           ;               
+ 06EA           ;
+ 06EA           ;Command syntax !0=PBMS         P=Port 0..1 B=Bit 0..7 M=Mode S=State
+ 06EA           ;
+ 06EA           ;
+ 06EA           ProcessDigOut:
+ 06EA           
+ 06EA 9FDF                      call    GetPortBit
+ 06EC C053                      jc              CmdError
+ 06EE                                   
+ 06EE 510A                      mov             a,[PORT]
+ 06F0 6D                        rrc             a
+ 06F1 6D                        rrc             a
+ 06F2 6D                        rrc             a
+ 06F3 2103                      and             a,#3                    ;Port 0?
+ 06F5 B00F                      jnz             SkipDACOFF              ;No, skip
+ 06F7 510A                      mov             a,[PORT]
+ 06F9 2107                      and             a,#7                    ;P02..P05?
+ 06FB 3902                      cmp             a,#2
+ 06FD C007                      jc              SkipDACOFF
+ 06FF 3906                      cmp             a,#6
+ 0701 D003                      jnc             SkipDACOFF
+ 0703 9CAB                      call    DisableDAC
+ 0705                           
+ 0705           SkipDACOFF:
+ 0705           		
+ 0705 90A0                      call    GetHexDigit             ;Mode
+ 0707 C038                      jc              CmdError
+ 0709                           
+ 0709 2103                      and             a,#3
+ 070B 70FB                      and             F,#~4
+ 070D 6A                        rlc             a               
+ 070E E001                      jacc    ModeLUT
+ 0710                           
+ 0710           ModeLUT:
+ 0710 800D                      jmp             SetPulldownMode
+ 0712 8017                      jmp             SetStrongMode
+ 0714 8003                      jmp             SetHighZMode
+ 0716 800D                      jmp             SetPullupMode
+ 0718                           
+ 0718           SetHighZMode:
+ 0718 510A                      mov             a,[PORT]
+ 071A 9C22                      call    SetDDRIn
+ 071C 8011                      jmp             DoneMode
+ 071E                           
+ 071E           SetPulldownMode:
+ 071E 510A                      mov             a,[PORT]
+ 0720 9BCA                      call    SetDDRPulldown
+ 0722 800B                      jmp             DoneMode
+ 0724           
+ 0724           SetPullupMode:
+ 0724 510A                      mov             a,[PORT]
+ 0726 9BED                      call    SetDDRPullup
+ 0728 8005                      jmp             DoneMode
+ 072A                           
+ 072A           SetStrongMode:
+ 072A 510A                      mov             a,[PORT]
+ 072C 9B8F                      call    SetDDROut
+ 072E                           
+ 072E                           ;fall thru
+ 072E                                                                           
+ 072E           DoneMode:
+ 072E 9077                      call    GetHexDigit             ;State (Clear/Set)
+ 0730 C00F                      jc              CmdError                
+ 0732 3900                      cmp             a,#0
+ 0734 A006                      jz              ClrDig
+ 0736           SetDig:
+ 0736 510A                      mov             a,[PORT]
+ 0738 9C35                      call    SetDigitalOutput
+ 073A 7F                        ret
+ 073B           ClrDig:
+ 073B 510A                      mov             a,[PORT]
+ 073D 9C3F                      call    ClrDigitalOutput
+ 073F 7F                        ret
+ 0740                           
+ 0740           CmdError:
+ 0740 503F                      mov             a,#'?'
+ 0742 9DFC                      call    TxIN
+ 0744 7F                        ret
+ 0745                           
+ 0745           ;
+ 0745           ;Command syntax !0WPGG          P=Port 2,3,4 or 5       GG=Gain 00..3D
+ 0745           ;
+ 0745           ProcessAnaOut:
+ 0745 9060                      call    GetHexDigit                     ;port
+ 0747 CFF8                      jc              CmdError
+ 0749 530A                      mov             [PORT],a
+ 074B 1102                      sub             a,#2
+ 074D CFF2                      jc              CmdError
+ 074F 3904                      cmp             a,#4                            ;make sure it lies within 2..5
+ 0751 DFEE                      jnc             CmdError
+ 0753 70FB                      and             F,#~4
+ 0755 6A                        rlc             a               
+ 0756 E001                      jacc    DACLUT
+ 0758                           
+ 0758           DACLUT:
+ 0758 8007                      jmp             Ctrl_DAC_P02
+ 075A 8012                      jmp             Ctrl_DAC_P03
+ 075C 801D                      jmp             Ctrl_DAC_P04
+ 075E 8028                      jmp             Ctrl_DAC_P05
+ 0760           
+ 0760           Ctrl_DAC_P02:
+ 0760 9032                      call    GetHexByte
+ 0762 CFDD                      jc              CmdError
+ 0764 393E                      cmp             a,#$3e
+ 0766 DFD9                      jnc             CmdError
+ 0768 9000                      call    DAC_P02_WriteStall
+ 076A 9D31                      call    DAC_P02_On
+ 076C 7F                        ret
+ 076D           
+ 076D           Ctrl_DAC_P03:
+ 076D 9025                      call    GetHexByte
+ 076F CFD0                      jc              CmdError
+ 0771 393E                      cmp             a,#$3e
+ 0773 DFCC                      jnc             CmdError
+ 0775 9000                      call    DAC_P03_WriteStall
+ 0777 9C46                      call    DAC_P03_On
+ 0779 7F                        ret
+ 077A           
+ 077A           Ctrl_DAC_P04:
+ 077A 9018                      call    GetHexByte
+ 077C CFC3                      jc              CmdError
+ 077E 393E                      cmp             a,#$3e
+ 0780 DFBF                      jnc             CmdError
+ 0782 9000                      call    DAC_P04_WriteStall
+ 0784 9CCD                      call    DAC_P04_On
+ 0786 7F                        ret
+ 0787           
+ 0787           Ctrl_DAC_P05:
+ 0787 900B                      call    GetHexByte
+ 0789 CFB6                      jc              CmdError
+ 078B 393E                      cmp             a,#$3e
+ 078D DFB2                      jnc             CmdError
+ 078F 9000                      call    DAC_P05_WriteStall
+ 0791 9C76                      call    DAC_P05_On
+ 0793 7F                        ret
+ 0794           
+ 0794           ;
+ 0794           ;Interpret next two character as a hex byte and return in A
+ 0794           ;
+ 0794           GetHexByte:
+ 0794 9011                      call    GetHexDigit
+ 0796 C00F                      jc              GetHexDone
+ 0798 6A                        rlc             a
+ 0799 6A                        rlc             a
+ 079A 6A                        rlc             a
+ 079B 6A                        rlc             a
+ 079C 21F0                      and             a,#240          
+ 079E 5300                      mov             [TMP],a
+ 07A0 9005                      call    GetHexDigit
+ 07A2 C003                      jc              GetHexDone
+ 07A4 2A00                      or              a,[TMP]
+ 07A6           GetHexDone:
+ 07A6 7F                        ret
+ 07A7                           
+ 07A7           ;
+ 07A7           ;Interpret next character as a hex digit and return in A
+ 07A7           ;
+ 07A7           ;Carry is set if digit was invalid
+ 07A7           ;
+ 07A7           GetHexDigit:
+ 07A7 3E02                      mvi             a,[TMP3]
+ 07A9 A014                      jz              InvalidDigit
+ 07AB 3930                      cmp             a,#'0'
+ 07AD C010                      jc              InvalidDigit
+ 07AF 1130                      sub             a,#'0'
+ 07B1 390A                      cmp             a,#10
+ 07B3 C007                      jc              ValidDigit
+ 07B5 1107                      sub             a,#7
+ 07B7 3910                      cmp             a,#16
+ 07B9 D004                      jnc             InvalidDigit
+ 07BB           ValidDigit:
+ 07BB 70FB                      and             F,#~4
+ 07BD 7F                        ret
+ 07BE           InvalidDigit:
+ 07BE 7104                      or              F,#4
+ 07C0 7F                        ret             
+ 07C1           
+ 07C1           ;
+ 07C1           ;Wait for pin to settle before sampling
+ 07C1           ;               
+ 07C1           SettleDelay:
+ 07C1 5768                      mov             x,#104                  ;10 ms
+ 07C3 5000                      mov             a,#0
+ 07C5           SettleLp:
+ 07C5 74                        inc             a                               ;96 us per iteration (2313 cyc)
+ 07C6 BFFE                      jnz             SettleLp
+ 07C8 79                        dec             x
+ 07C9 BFFB                      jnz             SettleLp
+ 07CB 7F                        ret
+ 07CC                           

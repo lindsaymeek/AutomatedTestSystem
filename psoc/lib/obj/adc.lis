@@ -1,0 +1,709 @@
+ 0000           ;;********************************************************************
+ 0000           ;;********************************************************************
+ 0000           ;;  ADCINC12.asm
+ 0000           ;;
+ 0000           ;;  Assembler source for the 12 bit Incremential A/D converter.
+ 0000           ;;
+ 0000           ;;  REV D, 2002 MAR 30
+ 0000           ;;
+ 0000           ;;  Copyright: Cypress MicroSystems 2000-2002.  All Rights Reserved.
+ 0000           ;;
+ 0000           ;;*********************************************************************
+ 0000           ;;*********************************************************************
+ 0000           
+                export  ADC_Start
+                export _ADC_Start
+                export  ADC_SetPower
+                export _ADC_SetPower
+                export  ADC_Stop
+                export _ADC_Stop
+                export  ADC_GetSamples
+                export _ADC_GetSamples
+                export  ADC_StopAD
+                export _ADC_StopAD
+                export  ADC_fIsData
+                export _ADC_fIsData
+                export  ADC_iGetData
+                export _ADC_iGetData
+                export  ADC_ClearFlag
+                export _ADC_ClearFlag
+                
+ 0088           ADC_AtoDcr0:    equ 88h
+ 0089           ADC_AtoDcr1:    equ 89h
+ 008A           ADC_AtoDcr2:    equ 8ah
+ 008B           ADC_AtoDcr3:    equ 8bh
+ 0024           ADC_CounterFN:  equ 24h
+ 0025           ADC_CounterSL:  equ 25h
+ 0026           ADC_CounterOS:  equ 26h
+ 0024           ADC_CounterDR0: equ 24h
+ 0025           ADC_CounterDR1: equ 25h
+ 0026           ADC_CounterDR2: equ 26h
+ 0027           ADC_CounterCR0: equ 27h
+ 0020           ADC_TimerFN:    equ 20h
+ 0021           ADC_TimerSL:    equ 21h
+ 0022           ADC_TimerOS:    equ 22h
+ 0020           ADC_TimerDR0:   equ 20h
+ 0021           ADC_TimerDR1:   equ 21h
+ 0022           ADC_TimerDR2:   equ 22h
+ 0023           ADC_TimerCR0:   equ 23h
+ 0001           ADC_TimerMask:   equ  01h
+ 0002           ADC_CounterMask: equ  02h
+ 0000           ADC_OFF:         equ  0
+ 0001           ADC_LOWPOWER:    equ  1
+ 0002           ADC_MEDPOWER:    equ  2
+ 0003           ADC_HIGHPOWER:   equ  3
+ 000C           ADC_NUMBITS:     equ  12
+ 0001           ADC_NoAZ:        equ  1
+ 0000           HighByte:                     equ  0
+ 0001           LowByte:                      equ  1
+ 0000           
+ 0000           macro ADC_ISDATA
+ 0000              mov A,[ADC_fIncr]
+ 0000           macro ADC_GETDATA
+ 0000              mov X,[(ADC_iIncr + HighByte)]
+ 0000              mov A,[(ADC_iIncr + LowByte)]
+ 0000           macro ADC_CLEARFLAG
+ 0000              mov [ADC_fIncr],00h
+ 0010           FlagXIOMask:  equ 10h
+ 0008           FlagSuper:    equ 08h
+ 0004           FlagCarry:    equ 04h
+ 0002           FlagZero:     equ 02h
+ 0001           FlagGlobalIE: equ 01h
+ 0000           
+ 0000           
+ 0000           ;;===================================
+ 0000           ;;      Register Space, Bank 0
+ 0000           ;;===================================
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Port Registers
+ 0000           ;  Note: Also see this address range in Bank 1.
+ 0000           ;------------------------------------------------
+ 0000           ; Port 0
+ 0000           PRT0DR:       equ 00h          ; Port 0 Data Register              (RW)
+ 0001           PRT0IE:       equ 01h          ; Port 0 Interrupt Enable Register  (WO)
+ 0002           PRT0GS:       equ 02h          ; Port 0 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 03h
+ 0000           ; Port 1
+ 0004           PRT1DR:       equ 04h          ; Port 1 Data Register              (RW)
+ 0005           PRT1IE:       equ 05h          ; Port 1 Interrupt Enable Register  (WO)
+ 0006           PRT1GS:       equ 06h          ; Port 1 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 07h
+ 0000           ; Port 2
+ 0008           PRT2DR:       equ 08h          ; Port 2 Data Register              (RW)
+ 0009           PRT2IE:       equ 09h          ; Port 2 Interrupt Enable Register  (WO)
+ 000A           PRT2GS:       equ 0Ah          ; Port 2 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 0Bh
+ 0000           ; Port 3
+ 000C           PRT3DR:       equ 0Ch          ; Port 3 Data Register              (RW)
+ 000D           PRT3IE:       equ 0Dh          ; Port 3 Interrupt Enable Register  (WO)
+ 000E           PRT3GS:       equ 0Eh          ; Port 3 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 0Fh
+ 0000           ; Port 4
+ 0010           PRT4DR:       equ 10h          ; Port 4 Data Register              (RW)
+ 0011           PRT4IE:       equ 11h          ; Port 4 Interrupt Enable Register  (WO)
+ 0012           PRT4GS:       equ 12h          ; Port 4 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 13h
+ 0000           ; Port 5
+ 0014           PRT5DR:       equ 14h          ; Port 5 Data Register              (RW)
+ 0015           PRT5IE:       equ 15h          ; Port 5 Interrupt Enable Register  (WO)
+ 0016           PRT5GS:       equ 16h          ; Port 5 Global Select Register     (WO)
+ 0000           ; (Reserved)  equ 17h
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Digital PSoC(tm) block Registers
+ 0000           ;  Note: Also see this address range in Bank 1.
+ 0000           ;------------------------------------------------
+ 0000           ; Digital PSoC block 0, Basic Type A
+ 0020           DBA00DR0:     equ 20h          ; data register 0                   (RO)
+ 0021           DBA00DR1:     equ 21h          ; data register 1                   (WO)
+ 0022           DBA00DR2:     equ 22h          ; data register 2                   (RW)
+ 0023           DBA00CR0:     equ 23h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 1, Basic Type A
+ 0024           DBA01DR0:     equ 24h          ; data register 0                   (RO)
+ 0025           DBA01DR1:     equ 25h          ; data register 1                   (WO)
+ 0026           DBA01DR2:     equ 26h          ; data register 2                   (RW)
+ 0027           DBA01CR0:     equ 27h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 2, Basic Type A
+ 0028           DBA02DR0:     equ 28h          ; data register 0                   (RO)
+ 0029           DBA02DR1:     equ 29h          ; data register 1                   (WO)
+ 002A           DBA02DR2:     equ 2Ah          ; data register 2                   (RW)
+ 002B           DBA02CR0:     equ 2Bh          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 3, Basic Type A
+ 002C           DBA03DR0:     equ 2Ch          ; data register 0                   (RO)
+ 002D           DBA03DR1:     equ 2Dh          ; data register 1                   (WO)
+ 002E           DBA03DR2:     equ 2Eh          ; data register 2                   (RW)
+ 002F           DBA03CR0:     equ 2Fh          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 4, Communications Type A
+ 0030           DCA04DR0:     equ 30h          ; data register 0                   (RO)
+ 0031           DCA04DR1:     equ 31h          ; data register 1                   (WO)
+ 0032           DCA04DR2:     equ 32h          ; data register 2                   (RW)
+ 0033           DCA04CR0:     equ 33h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 5, Communications Type A
+ 0034           DCA05DR0:     equ 34h          ; data register 0                   (RO)
+ 0035           DCA05DR1:     equ 35h          ; data register 1                   (WO)
+ 0036           DCA05DR2:     equ 36h          ; data register 2                   (RW)
+ 0037           DCA05CR0:     equ 37h          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 6, Communications Type A
+ 0038           DCA06DR0:     equ 38h          ; data register 0                   (RO)
+ 0039           DCA06DR1:     equ 39h          ; data register 1                   (WO)
+ 003A           DCA06DR2:     equ 3Ah          ; data register 2                   (RW)
+ 003B           DCA06CR0:     equ 3Bh          ; control & status register 0       (RW)
+ 0000           
+ 0000           ; Digital PSoC block 7, Communications Type A
+ 003C           DCA07DR0:     equ 3Ch          ; data register 0                   (RO)
+ 003D           DCA07DR1:     equ 3Dh          ; data register 1                   (WO)
+ 003E           DCA07DR2:     equ 3Eh          ; data register 2                   (RW)
+ 003F           DCA07CR0:     equ 3Fh          ; control & status register 0       (RW)
+ 0000           
+ 0000           
+ 0000           ;-------------------------------------
+ 0000           ;  Analog Resource Control Registers
+ 0000           ;-------------------------------------
+ 0060           AMX_IN:       equ 60h          ; analog input multiplexor control  (RW)
+ 0000                                          ; AMX_IN Bit field masks:
+ 00C0           AMX_IN_ACI3:          equ C0h          ; column 3 input mux
+ 0030           AMX_IN_ACI2:          equ 30h          ; column 2 input mux
+ 000C           AMX_IN_ACI1:          equ 0Ch          ; column 1 input mux
+ 0003           AMX_IN_ACI0:          equ 03h          ; column 0 input mux
+ 0000           
+ 0000           ; (Reserved)  equ 61h          ; reserved
+ 0000           ; (Reserved)  equ 62h          ; reserved
+ 0000           
+ 0063           ARF_CR:       equ 63h          ; analog reference control          (RW)
+ 0000                                          ; ARF_CR Bit field masks:
+ 0080           ARF_CR_BGT:           equ 80h          ; Bandgap Test
+ 0040           ARF_CR_HBE:           equ 40h          ; Bias level control
+ 0038           ARF_CR_REF:           equ 38h          ; Analog array ref control
+ 0004           ARF_CR_APWR:          equ 04h          ; Analog Power
+ 0003           ARF_CR_SCPWR:         equ 03h          ; Switched Cap block power
+ 0000           
+ 0064           CMP_CR:       equ 64h          ; comparator control                (*)
+ 0000                                          ; CMP_CR Bit field masks:
+ 0080           CMP_CR_COMP3:         equ 80h          ; Column 3 comparator state     (R)
+ 0040           CMP_CR_COMP2:         equ 40h          ; Column 2 comparator state     (R)
+ 0020           CMP_CR_COMP1:         equ 20h          ; Column 1 comparator state     (R)
+ 0010           CMP_CR_COMP0:         equ 10h          ; Column 0 comparator state     (R)
+ 0008           CMP_CR_AINT3:         equ 08h          ; Column 3 interrupt source     (RW)
+ 0004           CMP_CR_AINT2:         equ 04h          ; Column 2 interrupt source     (RW)
+ 0002           CMP_CR_AINT1:         equ 02h          ; Column 1 interrupt source     (RW)
+ 0001           CMP_CR_AINT0:         equ 01h          ; Column 0 interrupt source     (RW)
+ 0000           
+ 0065           ASY_CR:       equ 65h          ; analog synchronizaton control     (*)
+ 0000                                          ; ASY_CR Bit field masks:
+ 0007           ASY_CR_SARCOUNT:      equ 07h          ; SAR support: resolution count (W0)
+ 0008           ASY_CR_SARSIGN:       equ 08h          ; SAR support: sign             (RW)
+ 0006           ASY_CR_SARCOL:        equ 06h          ; SAR support: column spec	   (RW)
+ 0001           ASY_CR_SYNCEN:        equ 01h          ; Stall bit                     (RW)
+ 0000           
+ 0000           
+ 0000           ;---------------------------------------------------
+ 0000           ;  Analog PSoC block Registers
+ 0000           ;
+ 0000           ;  Note: the following registers are mapped into
+ 0000           ;  both register bank 0 AND register bank 1.
+ 0000           ;---------------------------------------------------
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 0
+ 0000           ; (Reserved)  equ 70h
+ 0071           ACA00CR0:     equ 71h          ; Control register 0                (RW)
+ 0072           ACA00CR1:     equ 72h          ; Control register 1                (RW)
+ 0073           ACA00CR2:     equ 73h          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 1
+ 0000           ; (Reserved)  equ 74h
+ 0075           ACA01CR0:     equ 75h          ; Control register 0                (RW)
+ 0076           ACA01CR1:     equ 76h          ; Control register 1                (RW)
+ 0077           ACA01CR2:     equ 77h          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 2
+ 0000           ; (Reserved)  equ 78h
+ 0079           ACA02CR0:     equ 79h          ; Control register 0                (RW)
+ 007A           ACA02CR1:     equ 7Ah          ; Control register 1                (RW)
+ 007B           ACA02CR2:     equ 7Bh          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Continuous Time PSoC block Type A Row 0 Col 3
+ 0000           ; (Reserved)  equ 7Ch
+ 007D           ACA03CR0:     equ 7Dh          ; Control register 0                (RW)
+ 007E           ACA03CR1:     equ 7Eh          ; Control register 1                (RW)
+ 007F           ACA03CR2:     equ 7Fh          ; Control register 2                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 1 Col 0
+ 0080           ASA10CR0:     equ 80h          ; Control register 0                (RW)
+ 0081           ASA10CR1:     equ 81h          ; Control register 1                (RW)
+ 0082           ASA10CR2:     equ 82h          ; Control register 2                (RW)
+ 0083           ASA10CR3:     equ 83h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 1 Col 1
+ 0084           ASB11CR0:     equ 84h          ; Control register 0                (RW)
+ 0085           ASB11CR1:     equ 85h          ; Control register 1                (RW)
+ 0086           ASB11CR2:     equ 86h          ; Control register 2                (RW)
+ 0087           ASB11CR3:     equ 87h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 1 Col 2
+ 0088           ASA12CR0:     equ 88h          ; Control register 0                (RW)
+ 0089           ASA12CR1:     equ 89h          ; Control register 1                (RW)
+ 008A           ASA12CR2:     equ 8Ah          ; Control register 2                (RW)
+ 008B           ASA12CR3:     equ 8Bh          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 1 Col 3
+ 008C           ASB13CR0:     equ 8Ch          ; Control register 0                (RW)
+ 008D           ASB13CR1:     equ 8Dh          ; Control register 1                (RW)
+ 008E           ASB13CR2:     equ 8Eh          ; Control register 2                (RW)
+ 008F           ASB13CR3:     equ 8Fh          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 2 Col 0
+ 0090           ASB20CR0:     equ 90h          ; Control register 0                (RW)
+ 0091           ASB20CR1:     equ 91h          ; Control register 1                (RW)
+ 0092           ASB20CR2:     equ 92h          ; Control register 2                (RW)
+ 0093           ASB20CR3:     equ 93h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 2 Col 1
+ 0094           ASA21CR0:     equ 94h          ; Control register 0                (RW)
+ 0095           ASA21CR1:     equ 95h          ; Control register 1                (RW)
+ 0096           ASA21CR2:     equ 96h          ; Control register 2                (RW)
+ 0097           ASA21CR3:     equ 97h          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType B Row 2 Col 2
+ 0098           ASB22CR0:     equ 98h          ; Control register 0                (RW)
+ 0099           ASB22CR1:     equ 99h          ; Control register 1                (RW)
+ 009A           ASB22CR2:     equ 9Ah          ; Control register 2                (RW)
+ 009B           ASB22CR3:     equ 9Bh          ; Control register 3                (RW)
+ 0000           
+ 0000           ; Switched Cap PSoC blockType A Row 2 Col 3
+ 009C           ASA23CR0:     equ 9Ch          ; Control register 0                (RW)
+ 009D           ASA23CR1:     equ 9Dh          ; Control register 1                (RW)
+ 009E           ASA23CR2:     equ 9Eh          ; Control register 2                (RW)
+ 009F           ASA23CR3:     equ 9Fh          ; Control register 3                (RW)
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  System and Global Resource Registers
+ 0000           ;  Note: Also see this address range in Bank 1.
+ 0000           ;------------------------------------------------
+ 00E0           INT_MSK0:                  equ E0h   ; General Interrupt Mask Register   (RW)
+ 0040           INT_MSK0_Sleep:            equ 40h  ; MASK: enable/disable sleep interrupt
+ 0020           INT_MSK0_GPIO:             equ 20h  ; MASK: enable/disable GPIO  interrupt
+ 0010           INT_MSK0_AColumn3:         equ 10h  ; MASK: enable/disable Analog col 3 interrupt
+ 0008           INT_MSK0_AColumn2:         equ 08h  ; MASK: enable/disable Analog col 2 interrupt
+ 0004           INT_MSK0_AColumn1:         equ 04h  ; MASK: enable/disable Analog col 1 interrupt
+ 0002           INT_MSK0_AColumn0:         equ 02h  ; MASK: enable/disable Analog col 0 interrupt
+ 0001           INT_MSK0_VoltageMonitor:   equ 01h  ; MASK: enable/disable Volts interrupt
+ 0000           
+ 00E1           INT_MSK1:     equ E1h          ; Digital PSoC block Mask Register  (RW)
+ 00E2           INT_VC:       equ E2h          ; Interrupt vector register         (RW)
+ 00E3           RES_WDT:      equ E3h          ; Watch Dog Timer                   (RW)
+ 0000           
+ 0000           ; DECIMATOR Registers
+ 00E4           DEC_DH:       equ E4h          ; Data Register (high byte)         (RW)
+ 00E5           DEC_DL:       equ E5h          ; Data Register ( low byte)         (RO)
+ 00E6           DEC_CR:       equ E6h          ; Data Control Register             (RW)
+ 0000           
+ 0000           ; Multiplier and MAC (Multiply/Accumulate) Unit
+ 00E8           MUL_X:        equ E8h          ; Multiplier X Register (write)            (WO)
+ 00E9           MUL_Y:        equ E9h          ; Multiplier Y Register (write)            (WO)
+ 00EA           MUL_DH:       equ EAh          ; Multiplier Result Data (high byte read)  (RO)
+ 00EB           MUL_DL:       equ EBh          ; Multiplier Result Data ( low byte read)  (RO)
+ 00EC           MAC_X:        equ ECh          ; MAC X register (write) [also see ACC_DR1](WO)
+ 00ED           MAC_Y:        equ EDh          ; MAC Y register (write) [also see ACC_DR0](WO)
+ 00EE           MAC_CL0:      equ EEh          ; MAC Clear Accum (write)[also see ACC_DR3](WO)
+ 00EF           MAC_CL1:      equ EFh          ; MAC Clear Accum (write)[also see ACC_DR2](WO)
+ 00EC           ACC_DR1:      equ ECh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 00ED           ACC_DR0:      equ EDh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 00EE           ACC_DR3:      equ EEh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 00EF           ACC_DR2:      equ EFh          ; MAC Accumulator (Read, byte 0)           (RO)
+ 0000           
+ 0000           ; Test Mode mapping of the CPU Flag (F) Register
+ 00F7           CPU_FLAG:     equ F7h          ; NOTE: Only mapped when in Test Mode !!!
+ 0000           
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  System Status and Control Register
+ 0000           ;
+ 0000           ;  Note: the following register is mapped into
+ 0000           ;  both register bank 0 AND register bank 1.
+ 0000           ;------------------------------------------------
+ 00FF           CPU_SCR:                equ FFh   ;                                     (*)
+ 0080           CPUSCR_GIEMask:         equ 80h   ; MASK: flag reg Global Int Enable shadow
+ 0020           CPUSCR_WDRSMask:        equ 20h   ; MASK: Watch Dog Timer Reset
+ 0010           CPUSCR_PORSMask:        equ 10h   ; MASK: power-on reset bit PORS
+ 0008           CPUSCR_SleepMask:       equ 08h   ; MASK: Enable Sleep
+ 0001           CPUSCR_StopMask:        equ 01h   ; MASK: Halt CPU bit
+ 0000           
+ 0000           
+ 0000           ;;===================================
+ 0000           ;;      Register Space, Bank 1
+ 0000           ;;===================================
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Port Registers
+ 0000           ;  Note: Also see this address range in Bank 0.
+ 0000           ;------------------------------------------------
+ 0000           ; Port 0
+ 0000           PRT0DM0:      equ 00h          ; Port 0 Drive Mode 0               (WO)
+ 0001           PRT0DM1:      equ 01h          ; Port 0 Drive Mode 1               (WO)
+ 0002           PRT0IC0:      equ 02h          ; Port 0 Interrupt Control 0        (WO)
+ 0003           PRT0IC1:      equ 03h          ; Port 0 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 1
+ 0004           PRT1DM0:      equ 04h          ; Port 1 Drive Mode 0               (WO)
+ 0005           PRT1DM1:      equ 05h          ; Port 1 Drive Mode 1               (WO)
+ 0006           PRT1IC0:      equ 06h          ; Port 1 Interrupt Control 0        (WO)
+ 0007           PRT1IC1:      equ 07h          ; Port 1 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 2
+ 0008           PRT2DM0:      equ 08h          ; Port 2 Drive Mode 0               (WO)
+ 0009           PRT2DM1:      equ 09h          ; Port 2 Drive Mode 1               (WO)
+ 000A           PRT2IC0:      equ 0Ah          ; Port 2 Interrupt Control 0        (WO)
+ 000B           PRT2IC1:      equ 0Bh          ; Port 2 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 3
+ 000C           PRT3DM0:      equ 0Ch          ; Port 3 Drive Mode 0               (WO)
+ 000D           PRT3DM1:      equ 0Dh          ; Port 3 Drive Mode 1               (WO)
+ 000E           PRT3IC0:      equ 0Eh          ; Port 3 Interrupt Control 0        (WO)
+ 000F           PRT3IC1:      equ 0Fh          ; Port 3 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 4
+ 0010           PRT4DM0:      equ 10h          ; Port 4 Drive Mode 0               (WO)
+ 0011           PRT4DM1:      equ 11h          ; Port 4 Drive Mode 1               (WO)
+ 0012           PRT4IC0:      equ 12h          ; Port 4 Interrupt Control 0        (WO)
+ 0013           PRT4IC1:      equ 13h          ; Port 4 Interrupt Control 1        (WO)
+ 0000           
+ 0000           ; Port 5
+ 0014           PRT5DM0:      equ 14h          ; Port 5 Drive Mode 0               (WO)
+ 0015           PRT5DM1:      equ 15h          ; Port 5 Drive Mode 1               (WO)
+ 0016           PRT5IC0:      equ 16h          ; Port 5 Interrupt Control 0        (WO)
+ 0017           PRT5IC1:      equ 17h          ; Port 5 Interrupt Control 1        (WO)
+ 0000           
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  Digital PSoC(tm) block Registers
+ 0000           ;  Note: Also see this address range in Bank 0.
+ 0000           ;------------------------------------------------
+ 0000           
+ 0000           ; Digital PSoC block 0, Basic Type A
+ 0020           DBA00FN:      equ 20h          ; Function Register                 (RW)
+ 0021           DBA00IN:      equ 21h          ;    Input Register                 (RW)
+ 0022           DBA00OU:      equ 22h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 23h
+ 0000           
+ 0000           ; Digital PSoC block 1, Basic Type A
+ 0024           DBA01FN:      equ 24h          ; Function Register                 (RW)
+ 0025           DBA01IN:      equ 25h          ;    Input Register                 (RW)
+ 0026           DBA01OU:      equ 26h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 27h
+ 0000           
+ 0000           ; Digital PSoC block 2, Basic Type A
+ 0028           DBA02FN:      equ 28h          ; Function Register                 (RW)
+ 0029           DBA02IN:      equ 29h          ;    Input Register                 (RW)
+ 002A           DBA02OU:      equ 2Ah          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 2Bh
+ 0000           
+ 0000           ; Digital PSoC block 3, Basic Type A
+ 002C           DBA03FN:      equ 2Ch          ; Function Register                 (RW)
+ 002D           DBA03IN:      equ 2Dh          ;    Input Register                 (RW)
+ 002E           DBA03OU:      equ 2Eh          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 2Fh
+ 0000           
+ 0000           ; Digital PSoC block 4, Communications Type A
+ 0030           DCA04FN:      equ 30h          ; Function Register                 (RW)
+ 0031           DCA04IN:      equ 31h          ;    Input Register                 (RW)
+ 0032           DCA04OU:      equ 32h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 33h
+ 0000           
+ 0000           ; Digital PSoC block 5, Communications Type A
+ 0034           DCA05FN:      equ 34h          ; Function Register                 (RW)
+ 0035           DCA05IN:      equ 35h          ;    Input Register                 (RW)
+ 0036           DCA05OU:      equ 36h          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 37h
+ 0000           
+ 0000           ; Digital PSoC block 6, Communications Type A
+ 0038           DCA06FN:      equ 38h          ; Function Register                 (RW)
+ 0039           DCA06IN:      equ 39h          ;    Input Register                 (RW)
+ 003A           DCA06OU:      equ 3Ah          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 3Bh
+ 0000           
+ 0000           ; Digital PSoC block 7, Communications Type A
+ 003C           DCA07FN:      equ 3Ch          ; Function Register                 (RW)
+ 003D           DCA07IN:      equ 3Dh          ;    Input Register                 (RW)
+ 003E           DCA07OU:      equ 3Eh          ;   Output Register                 (RW)
+ 0000           ; (Reserved)  equ 3Fh
+ 0000           
+ 0000           
+ 0000           ;------------------------------------------------
+ 0000           ;  System and Global Resource Registers
+ 0000           ;  Note: Also see this address range in Bank 0.
+ 0000           ;------------------------------------------------
+ 0000           
+ 0060           CLK_CR0:      equ 60h          ; Analog Column Clock Select Register     (RW)
+ 00C0           CLK_CR0_AColumn3:     equ C0h  ; MASK: Specify clock for analog cloumn
+ 0030           CLK_CR0_AColumn2:     equ 30h  ; MASK: Specify clock for analog cloumn
+ 000C           CLK_CR0_AColumn1:     equ 0Ch  ; MASK: Specify clock for analog cloumn
+ 0003           CLK_CR0_AColumn0:     equ 03h  ; MASK: Specify clock for analog cloumn
+ 0000           
+ 0061           CLK_CR1:      equ 61h          ; Analog Clock Source Select Register     (RW)
+ 0040           CLK_CR1_SHDIS:        equ 40h  ; MASK: Sample and Hold Disable (all Columns)
+ 0031           CLK_CR1_ACLK1:        equ 31h  ; MASK: Digital PSoC block for analog source
+ 0007           CLK_CR1_ACLK2:        equ 07h  ; MASK: Digital PSoC block for analog source
+ 0000           
+ 0062           ABF_CR:       equ 62h          ; Analog Output Buffer Control Register   (RW)
+ 00C0           ABF_CR_ACI3:          equ C0h  ; MASK: Level 1 input mux for analog column 3
+ 0030           ABF_CR_ACI2:          equ 30h  ; MASK: Level 1 input mux for analog column 2
+ 000C           ABF_CR_ACI1:          equ 0Ch  ; MASK: Level 1 input mux for analog column 1
+ 0003           ABF_CR_ACI0:          equ 03h  ; MASK: Level 1 input mux for analog column 0
+ 0000           
+ 0063           AMD_CR:       equ 63h          ; Analog Modulator Control Register       (RW)
+ 000C           AMD_CR_AMOD2:         equ 0Ch  ; MASK: Modulation source for analog column 2
+ 0003           AMD_CR_AMOD0:         equ 03h  ; MASK: Modulation source for analog column 1
+ 0000           
+ 0000           
+ 00E0           OSC_CR0:      equ E0h          ; System Oscillator Control Register      (RW)
+ 0080           OSC_CR0_32K_Select:   equ 80h  ; MASK: Enable/Disable External XTAL Oscillator
+ 0040           OSC_CR0_PLL_Mode:     equ 40h  ; MASK: Enable/Disable PLL
+ 0018           OSC_CR0_Sleep:        equ 18h  ; MASK: Set Sleep timer freq/period
+ 0000           OSC_CR0_Sleep_512Hz:  equ 00h  ;     Set sleep bits for 1.95ms period
+ 0008           OSC_CR0_Sleep_64Hz:   equ 08h  ;     Set sleep bits for 15.6ms period
+ 0010           OSC_CR0_Sleep_8Hz:    equ 10h  ;     Set sleep bits for 125ms period
+ 0018           OSC_CR0_Sleep_1Hz:    equ 18h  ;     Set sleep bits for 1 sec period
+ 0007           OSC_CR0_CPU:          equ 07h  ; MASK: Set CPU Frequency
+ 0000           OSC_CR0_CPU_3MHz:     equ 00h  ;     set CPU Freq bits for 3MHz Operation
+ 0001           OSC_CR0_CPU_6MHz:     equ 01h  ;     set CPU Freq bits for 6MHz Operation
+ 0002           OSC_CR0_CPU_12MHz:    equ 02h  ;     set CPU Freq bits for 12MHz Operation
+ 0003           OSC_CR0_CPU_24MHz:    equ 03h  ;     set CPU Freq bits for 24MHz Operation
+ 0004           OSC_CR0_CPU_1d5MHz:   equ 04h  ;     set CPU Freq bits for 1.5MHz Operation
+ 0005           OSC_CR0_CPU_750kHz:   equ 05h  ;     set CPU Freq bits for 750kHz Operation
+ 0006           OSC_CR0_CPU_187d5kHz: equ 06h  ;     set CPU Freq bits for 187.5kHz Operation
+ 0007           OSC_CR0_CPU_93d7kHz:  equ 07h  ;     set CPU Freq bits for 93.7kHz Operation
+ 0000           
+ 00E1           OSC_CR1:      equ E1h          ; System V1/V2 Divider Control Register   (RW)
+ 00F0           OSC_CR1_V1:           equ F0h  ; MASK System V1 24MHz divider
+ 000F           OSC_CR1_V2:           equ 0Fh  ; MASK System V2 24MHz divider
+ 0000           
+ 0000           ;Reserved     equ E2h
+ 00E3           VLT_CR:       equ E3h          ; Voltage Monitor Control Register        (RW)
+ 0000           
+ 00E8           IMO_TR:       equ E8h          ; Internal Main Oscillator Trim Register  (WO)
+ 00E9           ILO_TR:       equ E9h          ; Internal Low-speed Oscillator Trim      (WO)
+ 00EA           BDG_TR:       equ EAh          ; Band Gap Trim Register                  (WO)
+ 00EB           ECO_TR:       equ EBh          ; External Oscillator Trim Register       (WO)
+ 0000           
+ 0000           
+ 0000           
+ 0000           ;;===================================
+ 0000           ;;      M8C System Macros
+ 0000           ;;===================================
+ 0000           
+ 0000           
+ 0000           ;-------------------------------
+ 0000           ;  Swapping Register Banks
+ 0000           ;-------------------------------
+ 0000           
+ 0000               macro M8C_SetBank0
+ 0000               and   F, ~FlagXIOMask
+ 0000               macro M8C_SetBank1
+ 0000               or    F, FlagXIOMask
+ 0000               macro M8C_EnableGInt
+ 0000               or    F, FlagGlobalIE
+ 0000               macro M8C_DisableGInt
+ 0000               and   F, ~FlagGlobalIE
+ 0001           DISABLE_INT_FIX:   equ   1
+ 0000           ;---------------------------------------------------
+ 0000           ;  Use the following macros to enable/disable
+ 0000           ;  either of the two global interrupt mask registers,
+ 0000           ;  INT_MSK0 or INT_MSK1.
+ 0000           ; 
+ 0000           ;  This is a fix to a noted problem in which an 
+ 0000           ;  inadvertant reset can occur if an interrupt occurs
+ 0000           ;  while clearing an interrupt mask bit.
+ 0000           ; 
+ 0000           ;  Usage:    M8C_DisableIntMask INT_MSKN, MASK
+ 0000           ;            M8C_EnableIntMask  INT_MSKN, MASK
+ 0000           ;            
+ 0000           ;  where INT_MSKN is INT_MSK0 or INT_MSK1 and
+ 0000           ;        MASK is the bit set to enable or disable
+ 0000           ;-------------------------------------------------
+ 0000           ; Disable Interrupt Bit Mask(s) 
+ 0000               macro M8C_DisableIntMask
+ 0000           if DISABLE_INT_FIX
+ 0000               mov   A, reg[CPU_SCR]           ; save the current Global interrupt state
+ 0000               M8C_DisableGInt                 ; disable global interrupts
+ 0000           endif
+ 0000               and   reg[@0], ~@1              ; disable specified interrupt enable bit
+ 0000           if DISABLE_INT_FIX
+ 0000               and   A, CPUSCR_GIEMask         ; determine if global interrupt was set
+ 0000               jz    . + 4                     ; jump if global interrupt disabled
+ 0000               M8C_EnableGInt                  ; set global interrupt
+ 0000           endif
+ 0000               macro M8C_EnableIntMask                             
+ 0000               or    reg[@0], @1              
+ 0000               macro M8C_EnableWatchDog
+ 0000               ; Clearing the Power-On Reset bit starts up the Watchdog timer
+ 0000               ; See the 25xxx/26xxx Family Datasheet, Section 9.3.4.
+ 0000               and   reg[CPU_SCR], ~CPUSCR_PORSMask & ~CPUSCR_WDRSMask
+ 0000               macro M8C_ClearWDT
+ 0000               mov   reg[RES_WDT], 00h
+ 0000               macro M8C_ClearWDTAndSleep
+ 0000               mov   reg[RES_WDT], 38h
+ 0000               macro M8C_Stall
+ 0000               or    reg[ASY_CR], ASY_CR_SYNCEN
+ 0000               macro M8C_Unstall
+ 0000               and   reg[ASY_CR], ~ASY_CR_SYNCEN
+ 0000               macro M8C_Sleep
+ 0000               or    reg[CPU_SCR], CPUSCR_SleepMask
+ 0000               ; The next instruction to be executed depends on the state of the
+ 0000               ; various interrupt enable bits. If some interrupts are enabled
+ 0000               ; and the global interrupts are disabled, the next instruction will
+ 0000               ; be the one that follows the invocation of this macro. If global
+ 0000               ; interrupts are also enabled then the next instruction will be
+ 0000               ; from the interrupt vector table. If no interrupts are enabled
+ 0000               ; then RIP.
+ 0000               macro M8C_Stop
+ 0000               ; In general, you probably don't want to do this, but here's how:
+ 0000               or    reg[CPU_SCR], CPUSCR_StopMask
+ 0000               ; Next instruction to be executed is located in the interrupt
+ 0000               ; vector table entry for Power-On Reset.
+ 0000               macro M8C_Reset
+ 0000               ; Restore everything to the power-on reset state.
+ 0000               mov A, 0
+ 0000               SSC
+ 0000               ; Next non-supervisor instruction will be at interrupt vector 0.
+ 0000               macro SSC
+ 0000               db 0
+ 0001           LowByte:   equ 1
+ 0000           HighByte:  equ 0
+ 0000           
+ 0000           
+ 0000           ;;------------------------------------------------------------------
+ 0000           ;;  Start:
+ 0000           ;;  SetPower:
+ 0000           ;;  Applies power setting to the module's analog PSoc block.
+ 0000           ;;  INPUTS:  A contains the power setting
+ 0000           ;;  OUTPUTS: None.  
+ 0000           ;;------------------------------------------------------------------
+ 0000            ADC_Start:
+ 0000           _ADC_Start:
+ 0000            ADC_SetPower:
+ 0000           _ADC_SetPower:
+ 0000 10           push X            ;save X
+ 0001 4F           mov  X,SP       ;X will point at next pushed value
+ 0002 2103         and  A,03h
+ 0004 08           push A                  ;X points at copy of A
+ 0005 5D8B         mov  A,reg[ADC_AtoDcr3]
+ 0007 21FC         and  A,~03h       ;clear power bits
+ 0009 2B00         or   A,[ X ]
+ 000B 608B         mov  reg[ADC_AtoDcr3],A
+ 000D 18           pop  A
+ 000E 20           pop  X
+ 000F 7F           ret
+ 0010           
+ 0010           ;;------------------------------------------------------------------
+ 0010           ;;  Stop:
+ 0010           ;;  SetPower:
+ 0010           ;;  Removes power from the module's analog PSoc block.
+ 0010           ;;  INPUTS:  None.
+ 0010           ;;  OUTPUTS: None.  
+ 0010           ;;------------------------------------------------------------------
+ 0010            ADC_Stop:
+ 0010           _ADC_Stop:
+ 0010 418BFC       and reg[ADC_AtoDcr3], ~03h
+ 0013 7F           ret
+ 0014           
+ 0014           ;;------------------------------------------------------------------
+ 0014           ;;  Get_Samples:
+ 0014           ;;  SetPower:
+ 0014           ;;  Starts the A/D convertor and will place data is memory.  A flag
+ 0014           ;;  is set whenever a new data value is available.
+ 0014           ;;  INPUTS:  A passes the number of samples (0 is continous).
+ 0014           ;;  OUTPUTS: None.  
+ 0014           ;;------------------------------------------------------------------
+ 0014            ADC_GetSamples:
+ 0014           _ADC_GetSamples:
+ 0014 5300         mov [ADC_bIncrC],A         ;number of samples
+ 0016 43E103       or  reg[INT_MSK1],(ADC_TimerMask | ADC_CounterMask )
+ 0019                                                     ;Enable both interrupts
+ 0019 550001       mov [ADC_cTimerU],1       ;Force the Timer to do one cycle of rest
+                IF ADC_NoAZ
+ 001C 438A20       or  reg[ADC_AtoDcr2],20h  ;force the Integrator into reset
+                ENDIF
+ 001F 438B10       or  reg[ADC_AtoDcr3],10h
+ 0022 5500E0       mov [ADC_cCounterU],(-(1<<(ADC_NUMBITS - 7)));Initialize Counter
+ 0025 6221FF       mov reg[ADC_TimerDR1],ffh
+ 0028 6225FF       mov reg[ADC_CounterDR1],ffh
+ 002B 622301       mov reg[ADC_TimerCR0],01h ;enable the Timer
+ 002E 550000       mov [ADC_fIncr],00h       ;A/D Data Ready Flag is reset
+ 0031 7F           ret
+ 0032           
+ 0032           ;;------------------------------------------------------------------
+ 0032           ;;  StopAD:
+ 0032           ;;  Completely shuts down the A/D is an orderly manner.  Both the
+ 0032           ;;  Timer and COunter interrupts are disabled.
+ 0032           ;;  INPUTS:  None.
+ 0032           ;;  OUTPUTS: None.  
+ 0032           ;;------------------------------------------------------------------
+ 0032            ADC_StopAD:
+ 0032           _ADC_StopAD:
+ 0032 622300       mov reg[ADC_TimerCR0],00h       ;disable the Timer
+ 0035 622700       mov reg[ADC_CounterCR0],00h     ;disable the Counter
+ 0038 40           nop
+ 0039 40           nop
+ 003A              ;Disable both interrupts
+                if DISABLE_INT_FIX
+ 003A 5DFF          mov   A, reg[CPU_SCR]           ; save the current Global interrupt state
+ 003C 70FE          and   F, ~FlagGlobalIE
+                endif
+ 003E 41E1FC        and   reg[INT_MSK1], ~(ADC_TimerMask | ADC_CounterMask )              ; disable specified interrupt enable bit
+                if DISABLE_INT_FIX
+ 0041 2180          and   A, CPUSCR_GIEMask         ; determine if global interrupt was set
+ 0043 A003          jz    . + 4                     ; jump if global interrupt disabled
+ 0045 7101          or    F, FlagGlobalIE
+                endif
+                IF ADC_NoAZ
+ 0047 438A20       or  reg[ADC_AtoDcr2],20h        ;reset Integrator
+                ENDIF
+ 004A 438B10       or  reg[ADC_AtoDcr3],10h
+ 004D 7F           ret
+ 004E           ;;------------------------------------------------------------------
+ 004E           ;;  fIsData:
+ 004E           ;;  Returns the status of the A/D Data
+ 004E           ;;  is set whenever a new data value is available.
+ 004E           ;;  INPUTS:  None.
+ 004E           ;;  OUTPUTS: A returned data status A =: 0 no data available
+ 004E           ;;                                   !=: 0 data available.  
+ 004E           ;;------------------------------------------------------------------
+ 004E            ADC_fIsData:
+ 004E           _ADC_fIsData:
+ 004E 5100         mov A,[ADC_fIncr]
+ 0050 7F           ret
+ 0051           
+ 0051           ;;------------------------------------------------------------------
+ 0051           ;;  iGetData:
+ 0051           ;;  Returns the data from the A/D.  Does not check if data is
+ 0051           ;;  available.
+ 0051           ;;  is set whenever a new data value is available.
+ 0051           ;;  INPUTS:  None.
+ 0051           ;;  OUTPUTS: X:A returns the A/D data value.  
+ 0051           ;;------------------------------------------------------------------
+ 0051            ADC_iGetData:
+ 0051           _ADC_iGetData:
+ 0051 5800         mov X,[(ADC_iIncr + HighByte)]
+ 0053 5101         mov A,[(ADC_iIncr + LowByte)]
+ 0055 7F           ret
+ 0056           
+ 0056           ;;------------------------------------------------------------------
+ 0056           ;;  ClearFlag:
+ 0056           ;;  clears the data ready flag.
+ 0056           ;;  INPUTS:  None.
+ 0056           ;;  OUTPUTS: None.
+ 0056           ;;------------------------------------------------------------------
+ 0056            ADC_ClearFlag:
+ 0056           _ADC_ClearFlag:
+ 0056 550000       mov [ADC_fIncr],00h
+ 0059 7F           ret
+ 005A           
+ 005A           ADC_API_End:
+ 005A           	

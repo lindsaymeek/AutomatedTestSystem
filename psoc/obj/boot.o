@@ -1,0 +1,122 @@
+XH
+H 8 areas 13 global symbols
+M BOOT.ASM
+S _main Ref0000
+S SampleCLKINT Ref0000
+S UARTOUTRX_INT Ref0000
+S UARTOUTTX_INT Ref0000
+S ADC_CNT_INT Ref0000
+S ADC_TMR_INT Ref0000
+S LoadConfigInit Ref0000
+S __bss_end Ref0000
+S UARTINRX_INT Ref0000
+S UARTINTX_INT Ref0000
+S BAUDCLKINT Ref0000
+A TOP size 63 flags C
+dbfile E:\CONTES~1\ENTRY201\BOOT.ASM
+dbfunc 0 ? 0 I
+dbline 41 0
+dbline 44 4
+dbline 45 5
+dbline 48 8
+dbline 49 B
+dbline 4C C
+dbline 4D F
+dbline 50 10
+dbline 51 13
+dbline 54 14
+dbline 55 17
+dbline 58 18
+dbline 59 1B
+dbline 5C 1C
+dbline 5D 1F
+dbline 60 20
+dbline 61 23
+dbline 64 24
+dbline 65 27
+dbline 69 28
+dbline 6D 2C
+dbline 71 30
+dbline 75 34
+dbline 79 38
+dbline 7C 3C
+dbline 7D 3E
+dbline 8F 3F
+dbline A0 40
+dbline A1 41
+dbline E0 42
+dbline E1 44
+dbline 1 45
+dbline 11F 47
+dbline 1 4A
+dbline 125 4C
+dbline 126 4F
+dbline 127 52
+dbline 128 55
+dbline 129 58
+dbline 135 5B
+dbline 13B 5E
+dbline 13D 61
+S _exit Def0061
+S __start Def0042
+A lit size 0 flags 0
+S __lit_start Def0000
+A idata size 0 flags 0
+S __idata_start Def0000
+A func_lit size 0 flags 0
+S __func_lit_start Def0000
+A text size 0 flags 0
+S __text_start Def0000
+A data size 0 flags 20
+S __data_start Def0000
+A virtual_registers size 0 flags 20
+A bss size 0 flags 20
+dbfile E:\CONTES~1\ENTRY201\BOOT.ASM
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8ssc.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\BOOT.ASM
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\BOOT.ASM
+dbfunc 0 ? 0 I
+dbfile .\lib\entry201_GlobalParams.inc
+dbfunc 0 ? 0 I
+S __bss_start Def0000
+T 00 00 80 41
+R 00 00 00 00
+T 00 04 30 7E
+R 00 00 00 00
+T 00 08 7D 00 00 7E
+R 00 00 00 00 02 03 00 05
+T 00 0C 7D 00 00 7E
+R 00 00 00 00 02 03 00 04
+T 00 10 7D 00 00 7E
+R 00 00 00 00 02 03 00 0A
+T 00 14 7D 00 00 7E
+R 00 00 00 00 02 03 00 01
+T 00 18 7D 00 00 7E
+R 00 00 00 00 02 03 00 03
+T 00 1C 7D 00 00 7E
+R 00 00 00 00 02 03 00 02
+T 00 20 7D 00 00 7E
+R 00 00 00 00 02 03 00 08
+T 00 24 7D 00 00 7E
+R 00 00 00 00 02 03 00 09
+T 00 28 7E
+R 00 00 00 00
+T 00 2C 7E
+R 00 00 00 00
+T 00 30 7E
+R 00 00 00 00
+T 00 34 7E
+R 00 00 00 00
+T 00 38 7E
+R 00 00 00 00
+T 00 3C 80 02 7E 08 18 7E 50 00 00 4E 71 10 62 E0
+R 00 00 00 00 0B 09 00 07
+T 00 49 03 70 EF 62 71 05 62 75 05 62 79 05 62 7D
+R 00 00 00 00
+T 00 57 05 7C 00 00 62 E2 00 7C 00 00 8F FF
+R 00 00 00 00 02 04 00 06 02 0A 00 00

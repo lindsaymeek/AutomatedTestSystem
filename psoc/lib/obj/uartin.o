@@ -1,0 +1,69 @@
+XH
+H 1 areas 10 global symbols
+M UARTIN.ASM
+A text size 3C flags 0
+dbfile E:\CONTES~1\ENTRY201\LIB\UARTIN.ASM
+dbfunc 0 ? 0 I
+dbline 1 0
+dbline 1 3
+dbline 4B 6
+dbline 2 7
+dbline 1 9
+dbline 5 B
+dbline 7 E
+dbline 8 10
+dbline 1 12
+dbline 2 14
+dbline 1 16
+dbline 5 18
+dbline 7 1B
+dbline 8 1D
+dbline 1 1F
+dbline 67 21
+dbline 81 22
+dbline 82 24
+dbline 83 26
+dbline 84 28
+dbline 9C 29
+dbline 9D 2C
+dbline 9E 2F
+dbline B6 30
+dbline B7 32
+dbline D1 33
+dbline D2 35
+dbline EB 36
+dbline EC 38
+dbline 106 39
+dbline 107 3B
+dbfile UARTIN.inc
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\ENTRY201\LIB\UARTIN.ASM
+dbfunc 0 ? 0 I
+dbfile E:\CONTES~1\PSOC\TOOLS\include/m8c.inc
+dbfunc 0 ? 0 I
+S _UARTIN_EnableInt Def0000
+S UARTIN_DisableInt Def0007
+S UARTIN_SendData Def0030
+S _UARTIN_Stop Def0029
+S UARTIN_Start Def0022
+S bUARTIN_ReadRxData Def0036
+S bUARTIN_ReadRxStatus Def0039
+S bUARTIN_ReadTxStatus Def0033
+S _UARTIN_DisableInt Def0007
+S _UARTIN_SendData Def0030
+S _UARTIN_Start Def0022
+S UARTIN_EnableInt Def0000
+S _bUARTIN_ReadRxData Def0036
+S _bUARTIN_ReadRxStatus Def0039
+S _bUARTIN_ReadTxStatus Def0033
+S UARTIN_Stop Def0029
+T 00 00 43 E1 80 43 E1 40 7F 5D FF 70 FE 41 E1 7F
+R 00 00 00 00
+T 00 0E 21 80 A0 03 71 01 5D FF 70 FE 41 E1 BF 21
+R 00 00 00 00
+T 00 1C 80 A0 03 71 01 7F 29 01 60 3F 60 3B 7F 41
+R 00 00 00 00
+T 00 2A 3F FE 41 3B FE 7F 60 3D 7F 5D 3F 7F 5D 3A
+R 00 00 00 00
+T 00 38 7F 5D 3B 7F
+R 00 00 00 00
